@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="Configure your equipment">
+		<Preference
+			android:title="Devices"
+			android:summary="Configure your networked hardware"
+			android:key="devicesPref" />
+		<Preference
+			android:title="Components"
+			android:summary="Configure your IR components"
+			android:key="componentsPref" />
+		<Preference
+			android:title="Cold Reset"
+			android:summary="Reset to factory defaults"
+			android:key="resetPref" />
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="User interface settings">
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/mod_ctrl" android:title="Ctrl"></item>
+    <item android:id="@+id/mod_alt" android:title="Alt"></item>
+    <item android:id="@+id/mod_win" android:title="Windows"></item>        LinearLayout buttonLayout = new LinearLayout(this);
+
+</menu>

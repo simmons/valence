@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Valence</string>
+    <string name="about_version">Version: 1.2</string>
+    <string name="about_build_date">Build: 2011-08-28</string>
+    <string name="about_copyright">© 2011 David Simmons</string>
+    <string name="about_url">http://cafbit.com/</string>
+    <string name="about_description">
+        Valence turns your Android phone or tablet into a remote
+        keyboard and mouse for any computer running a VNC server.
+    </string>
+</resources>
