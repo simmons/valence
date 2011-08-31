@@ -21,10 +21,10 @@
 package com.cafbit.valence.rfb;
 
 public class RFBPointerEvent implements RFBEvent {
-	public long dt = 0L;
-	public float dx = 0.0f, dy = 0.0f;
-	public boolean button1 = false;
-	public boolean button2 = false;
-	public float sx = 0.0f;
-	public float sy = 0.0f;
+    public long dt = 0L;
+    public float dx = 0.0f, dy = 0.0f;
+    public boolean button1 = false;
+    public boolean button2 = false;
+    public float sx = 0.0f;
+    public float sy = 0.0f;
 }

@@ -38,79 +38,79 @@ import com.cafbit.xmlfoo.annotations.SingletonCode;
 
 @SingletonCode("valence")
 public class ValenceDeviceClass implements DeviceClass {
-	
-	// package-private constants
-	static final String DEVICE_CODE = "valence";
-	static final String DEVICE_NAME = "VNC Server";
-	static final String DEVICE_DESCRIPTION = "Control your computer via VNC";
+    
+    // package-private constants
+    static final String DEVICE_CODE = "valence";
+    static final String DEVICE_NAME = "VNC Server";
+    static final String DEVICE_DESCRIPTION = "Control your computer via VNC";
 
-	@Override
-	public String getDeviceCode() {
-		return DEVICE_CODE;
-	}
+    @Override
+    public String getDeviceCode() {
+        return DEVICE_CODE;
+    }
 
-	@Override
-	public String getDeviceName() {
-		return DEVICE_NAME;
-	}
+    @Override
+    public String getDeviceName() {
+        return DEVICE_NAME;
+    }
 
-	@Override
-	public String getDeviceDescription() {
-		return DEVICE_DESCRIPTION;
-	}
-	
-	@Override
-	public Class<? extends Device> getDeviceType() {
-		return ValenceDevice.class;
-	}
-	
-	@Override
-	public View createDeviceSetupView(Context context, Device device, boolean isUpdate, OnDeviceChange onDeviceChange, DeviceSetupState deviceSetupState) {
-		return new ValenceDeviceSetupView(context, (ValenceDevice) device, isUpdate, onDeviceChange, this, (ValenceDeviceSetupState) deviceSetupState);
-	}
-	
-	public ValenceDevice probe(final String hostname, final InetAddress address, final int port, final String password, final ValenceDevice deviceTemplate) throws IOException {
-		RFBConnection conn;
-		if (hostname.equals(RFBConnection.MAGIC_DEMO_HOSTNAME)) {
-			conn = new RFBConnection(hostname);
- 		} else {
- 			conn = new RFBConnection(address, port, password);
- 		}
-		try {
-			conn.connect();
-			conn.disconnect();
-		} catch (RFBException e) {
-			throw new IOException(e.getMessage());
-		}
-		
-	    // construct a Device object
-	    ValenceDevice device;
-	    if (deviceTemplate != null) {
-	    	device = deviceTemplate;
-	    } else {
-	    	device = new ValenceDevice();
-	    }
+    @Override
+    public String getDeviceDescription() {
+        return DEVICE_DESCRIPTION;
+    }
+    
+    @Override
+    public Class<? extends Device> getDeviceType() {
+        return ValenceDevice.class;
+    }
+    
+    @Override
+    public View createDeviceSetupView(Context context, Device device, boolean isUpdate, OnDeviceChange onDeviceChange, DeviceSetupState deviceSetupState) {
+        return new ValenceDeviceSetupView(context, (ValenceDevice) device, isUpdate, onDeviceChange, this, (ValenceDeviceSetupState) deviceSetupState);
+    }
+    
+    public ValenceDevice probe(final String hostname, final InetAddress address, final int port, final String password, final ValenceDevice deviceTemplate) throws IOException {
+        RFBConnection conn;
+        if (hostname.equals(RFBConnection.MAGIC_DEMO_HOSTNAME)) {
+            conn = new RFBConnection(hostname);
+        } else {
+            conn = new RFBConnection(address, port, password);
+        }
+        try {
+            conn.connect();
+            conn.disconnect();
+        } catch (RFBException e) {
+            throw new IOException(e.getMessage());
+        }
+        
+        // construct a Device object
+        ValenceDevice device;
+        if (deviceTemplate != null) {
+            device = deviceTemplate;
+        } else {
+            device = new ValenceDevice();
+        }
 
-	    device.deviceClass = this;
-	    device.address = hostname;
-	    device.port = port;
-	    if ((device.serverName == null) || (device.serverName.length()==0)) {
-	    	device.serverName = conn.getServerName();
-	    }
-	    device.serverVersion = conn.getServerVersion().toString();
-	    device.password = password;
-	    
-	    return device;
-	}
+        device.deviceClass = this;
+        device.address = hostname;
+        device.port = port;
+        if ((device.serverName == null) || (device.serverName.length()==0)) {
+            device.serverName = conn.getServerName();
+        }
+        device.serverVersion = conn.getServerVersion().toString();
+        device.password = password;
+        
+        return device;
+    }
 
-	@Override
-	public ReceiverThread getCustomDiscoveryReceiverThread(NetworkManagerThread networkManager) throws IOException {
-		return null;
-	}
-	
-	@Override
-	public MDNSDiscoveryHandler getMDNSDiscoveryHandler(DiscoveryManagerThread networkManager) throws IOException {
-		return new ValenceMDNSDiscoveryHandler(networkManager, this);
-	}
-	
+    @Override
+    public ReceiverThread getCustomDiscoveryReceiverThread(NetworkManagerThread networkManager) throws IOException {
+        return null;
+    }
+    
+    @Override
+    public MDNSDiscoveryHandler getMDNSDiscoveryHandler(DiscoveryManagerThread networkManager) throws IOException {
+        return new ValenceMDNSDiscoveryHandler(networkManager, this);
+    }
+    
 }

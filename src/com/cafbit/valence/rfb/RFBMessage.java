@@ -18,5 +18,5 @@
 package com.cafbit.valence.rfb;
 
 public abstract class RFBMessage {
-	public abstract byte[] getBytes();
+    public abstract byte[] getBytes();
 }

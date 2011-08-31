@@ -28,32 +28,32 @@ import android.content.Context;
 
 public class MoteContextImpl extends MoteContext {
 
-	public static List<DeviceClass> deviceClasses =
-		Arrays.asList(new DeviceClass[] {
-			new ValenceDeviceClass()
-		});
+    public static List<DeviceClass> deviceClasses =
+        Arrays.asList(new DeviceClass[] {
+            new ValenceDeviceClass()
+        });
 
-	public MoteContextImpl(Context context) {
-		super(context);
-	}
-	
-	@Override
-	public String getDeviceWord(DeviceClass deviceClass, boolean plural, boolean capitalized) {
-		if (plural) {
-			return "VNC servers";
-		} else {
-			return "VNC server";
-		}
-	}
+    public MoteContextImpl(Context context) {
+        super(context);
+    }
+    
+    @Override
+    public String getDeviceWord(DeviceClass deviceClass, boolean plural, boolean capitalized) {
+        if (plural) {
+            return "VNC servers";
+        } else {
+            return "VNC server";
+        }
+    }
 
-	@Override
-	public List<DeviceClass> getAllDeviceClasses() {
-		return deviceClasses;
-	}
+    @Override
+    public List<DeviceClass> getAllDeviceClasses() {
+        return deviceClasses;
+    }
 
-	@Override
-	public int getSettingsXmlResource() {
-		return R.xml.settings;
-	}
+    @Override
+    public int getSettingsXmlResource() {
+        return R.xml.settings;
+    }
 
 }

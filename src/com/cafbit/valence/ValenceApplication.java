@@ -26,28 +26,28 @@ import com.cafbit.motelib.MoteContext;
 import android.app.Application;
 
 public class ValenceApplication extends Application implements MoteApplication {
-	
-	private static ValenceApplication instance;
-	private MoteContext moteContext;
+    
+    private static ValenceApplication instance;
+    private MoteContext moteContext;
 
-	public ValenceApplication() {
-	}
+    public ValenceApplication() {
+    }
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		instance = this;
-		this.moteContext = new MoteContextImpl(this); 
-	}
-	
-	@Override
-	public MoteContext getMoteContext() {
-		return moteContext;
-	}
-	
-	public ValenceApplication getInstance() {
-		return instance;
-	}
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        instance = this;
+        this.moteContext = new MoteContextImpl(this); 
+    }
+    
+    @Override
+    public MoteContext getMoteContext() {
+        return moteContext;
+    }
+    
+    public ValenceApplication getInstance() {
+        return instance;
+    }
 
-	
+    
 }

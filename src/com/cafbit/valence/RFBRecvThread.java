@@ -23,47 +23,47 @@ import com.cafbit.valence.RFBThread.RFBThreadHandler;
 
 public class RFBRecvThread extends Thread {
 
-	private static int serial = 0;
-	
-	private RFBThreadHandler parentHandler;
-	private Socket socket;
-	private boolean valid = true;
-	
-	public RFBRecvThread(RFBThreadHandler handler, Socket socket) {
-		this.parentHandler = handler;
-		this.socket = socket;
-		setName("rfbrecv-"+(serial++));
-	}
-	
-	public void invalidate() {
-		valid = false;
-	}
-	
-	@Override
-	public void run() {
-		if (socket == null) {
-			// demo mode
-			return;
-		}
-		byte buffer[] = new byte[4096];
-		while (true) {
-			int ret;
-			try {
-				socket.setSoTimeout(0);
-				ret = socket.getInputStream().read(buffer);
-			} catch (Exception e) {
-				if (valid) {
-					parentHandler.error(e);
-				}
-				break;
-			}
-			if (ret == -1) {
-				if (valid) {
-					parentHandler.onRecvDisconnect();
-				}
-				break;
-			}
-		}
-	}
-	
+    private static int serial = 0;
+    
+    private RFBThreadHandler parentHandler;
+    private Socket socket;
+    private boolean valid = true;
+    
+    public RFBRecvThread(RFBThreadHandler handler, Socket socket) {
+        this.parentHandler = handler;
+        this.socket = socket;
+        setName("rfbrecv-"+(serial++));
+    }
+    
+    public void invalidate() {
+        valid = false;
+    }
+    
+    @Override
+    public void run() {
+        if (socket == null) {
+            // demo mode
+            return;
+        }
+        byte buffer[] = new byte[4096];
+        while (true) {
+            int ret;
+            try {
+                socket.setSoTimeout(0);
+                ret = socket.getInputStream().read(buffer);
+            } catch (Exception e) {
+                if (valid) {
+                    parentHandler.error(e);
+                }
+                break;
+            }
+            if (ret == -1) {
+                if (valid) {
+                    parentHandler.onRecvDisconnect();
+                }
+                break;
+            }
+        }
+    }
+    
 }

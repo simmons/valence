@@ -32,42 +32,42 @@ import android.view.View;
 import android.widget.TextView;
 
 public class OptionsMenuHelper {
-	
-	public static boolean onCreateOptionsMenu(Activity activity, Menu menu) {
-	    MenuInflater inflater = activity.getMenuInflater();
-	    inflater.inflate(R.menu.options_menu, menu);
-	    return true;
-	}
-	
-	public static boolean onOptionsItemSelected(Activity activity, MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	    case R.id.about:
-	    	about(activity);
-	    	return true;
-	    case R.id.help:
-	    	Intent intent = new Intent(activity, HelpActivity.class);
-	    	activity.startActivity(intent);
-	    	return true;
-	    default:
-	    	return false;
-	    }
-	}
+    
+    public static boolean onCreateOptionsMenu(Activity activity, Menu menu) {
+        MenuInflater inflater = activity.getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
+    }
+    
+    public static boolean onOptionsItemSelected(Activity activity, MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.about:
+            about(activity);
+            return true;
+        case R.id.help:
+            Intent intent = new Intent(activity, HelpActivity.class);
+            activity.startActivity(intent);
+            return true;
+        default:
+            return false;
+        }
+    }
 
-	private static void about(Activity activity) {
+    private static void about(Activity activity) {
         LayoutInflater factory = LayoutInflater.from(activity);
         View view = factory.inflate(R.layout.about,null);
         TextView urlView = (TextView) view.findViewById(R.id.about_url);
         Linkify.addLinks(urlView, Linkify.WEB_URLS);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder
-			.setTitle("About")
-			.setIcon(android.R.drawable.ic_dialog_info)
-			.setView(view)
-		    .setCancelable(true)
-		    .setNeutralButton("OK", null);
-		AlertDialog alert = builder.create();
-		alert.show();
-	}
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder
+            .setTitle("About")
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .setView(view)
+            .setCancelable(true)
+            .setNeutralButton("OK", null);
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 }

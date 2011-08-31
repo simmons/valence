@@ -26,77 +26,77 @@ import com.cafbit.xmlfoo.annotations.LameCrypt;
 
 public class ValenceDevice extends Device {
 
-	public int port = 5900;
-	public String serverName;
-	public String serverVersion;
-	@LameCrypt
-	public String password;
-	public boolean ard35Compatibility = false;
-	
-	public ValenceDevice() {
-	}
-	
-	public ValenceDevice(DeviceClass deviceClass) {
-		this.deviceClass = deviceClass;
-	}
+    public int port = 5900;
+    public String serverName;
+    public String serverVersion;
+    @LameCrypt
+    public String password;
+    public boolean ard35Compatibility = false;
+    
+    public ValenceDevice() {
+    }
+    
+    public ValenceDevice(DeviceClass deviceClass) {
+        this.deviceClass = deviceClass;
+    }
 
-	public InetAddress getInetAddress() {
-		if (address == null) {
-			return null;
-		}
-		InetAddress inetAddress;
-		try {
-			InetAddress addresses[] =
-				InetAddress.getAllByName(address);
-			// is this check really necessary?
-			if (addresses.length == 0) {
-				throw new UnknownHostException("No such host.");
-			}
-			inetAddress = addresses[0];
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
-		return inetAddress;
-	}
-	
-	@Override
-	public String getHeadline() {
-		return serverName;
-	}
-	
-	@Override
-	public String getDescription() {
-		StringBuilder sb = new StringBuilder();
-		
-		String name;
-		if (serverName == null) {
-			name = "";
-		} else if (serverName.contains("@")) {
-			name = serverName.substring(0, serverName.indexOf('@')) + "@";
-		} else {
-			name = serverName + "@";
-		}
-		
-		String version;
-		if (serverVersion != null) {
-			version = " (v"+serverVersion+")";
-		} else {
-			version = "";
-		}
-		
-		sb.append(name);
-		sb.append(address);
-		if (port != 5900) {
-			sb.append(":"+port);
-		}
-		sb.append(version);
-		
-		return sb.toString();
-	}
+    public InetAddress getInetAddress() {
+        if (address == null) {
+            return null;
+        }
+        InetAddress inetAddress;
+        try {
+            InetAddress addresses[] =
+                InetAddress.getAllByName(address);
+            // is this check really necessary?
+            if (addresses.length == 0) {
+                throw new UnknownHostException("No such host.");
+            }
+            inetAddress = addresses[0];
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return inetAddress;
+    }
+    
+    @Override
+    public String getHeadline() {
+        return serverName;
+    }
+    
+    @Override
+    public String getDescription() {
+        StringBuilder sb = new StringBuilder();
+        
+        String name;
+        if (serverName == null) {
+            name = "";
+        } else if (serverName.contains("@")) {
+            name = serverName.substring(0, serverName.indexOf('@')) + "@";
+        } else {
+            name = serverName + "@";
+        }
+        
+        String version;
+        if (serverVersion != null) {
+            version = " (v"+serverVersion+")";
+        } else {
+            version = "";
+        }
+        
+        sb.append(name);
+        sb.append(address);
+        if (port != 5900) {
+            sb.append(":"+port);
+        }
+        sb.append(version);
+        
+        return sb.toString();
+    }
 
-	public String toString() {
-		return "valence://"+address+"/";
-	}
+    public String toString() {
+        return "valence://"+address+"/";
+    }
 
 }

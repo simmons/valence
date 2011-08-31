@@ -18,8 +18,8 @@
 package com.cafbit.valence.rfb;
 
 public class RFBException extends Exception {
-	private static final long serialVersionUID = -3123355580007791630L;
-	private static final String DEFAULT_MESSAGE =
+    private static final long serialVersionUID = -3123355580007791630L;
+    private static final String DEFAULT_MESSAGE =
         "A problem occured while communicating with the VNC server.";
     
     public RFBException() {

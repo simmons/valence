@@ -1,0 +1,52 @@
+
+Valence, the input-only VNC client for Android
+======================================================================
+
+(c) 2011 David Simmons
+Licensed under the Apache License, Version 2.0
+
+http://cafbit.com/entry/introducing_valence
+https://market.android.com/details?id=com.cafbit.valence
+
+Valence is an input-only VNC client that turns your Android handset
+or tablet into a remote mouse and keyboard for any computer running
+a VNC server.  See the links above for more information.
+
+
+Building Valence
+--------------------------------------------------
+
+To build Valence, you'll need to clone the following repositories from 
+my account on GitHub:
+
+valence     git@github.com:simmons/valence.git
+motelib     git@github.com:simmons/motelib.git
+netlib      git@github.com:simmons/netlib.git
+xmlfoo      git@github.com:simmons/xmlfoo.git
+
+Make sure these repositories share a common parent directory, so that
+the "valence" project can access the "xmlfoo" project with "../xmlfoo",
+for instance.
+
+1. Install Eclipse and Google's Android Development Tools (ADT)
+   for Eclipse.
+
+2. Set up a fresh Eclipse workspace with the following settings which
+   can be configured in the preferences:
+    a. Under Java->Compiler, set the Java compliance level to "1.6".
+    b. Under Android, set up your Android SDK directory and target.
+       I use the "Android 2.1-update1" target for Valence.
+
+3. Add the projects:
+    a. File->Import...->General->Existing Projects into Workspace.
+    b. Select the directory that contains the four projects.
+    c. A list of the projects will appear.  Select each project.
+    d. Leave "Copy projects into workspace" and "Add project to working sets" unchecked.
+    e. "Finish".
+
+The projects will initially appear with many errors flagged, as
+Eclipse and the ADT perform the build tasks, but should settle in a
+bit.  If not, it sometimes helps to close the project (right-click on
+the project name and click "Close Project") and re-open it, which
+forces ADT to regenerate certain files.
+
