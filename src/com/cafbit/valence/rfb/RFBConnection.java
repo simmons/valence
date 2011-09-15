@@ -29,6 +29,7 @@ public class RFBConnection {
     public static final byte SECURITY_INVALID = 0x00;
     public static final byte SECURITY_NONE    = 0x01;
     public static final byte SECURITY_VNCAUTH = 0x02;
+    public static final byte SECURITY_ARD     = 0x1E;
     
     public static final int DEFAULT_PORT = 5900;
     public static final String MAGIC_DEMO_HOSTNAME = "demo.local";
@@ -43,6 +44,7 @@ public class RFBConnection {
     private Socket socket = null;
     private RFBStream stream = null;
     private Version serverVersion;
+    private byte[] securityTypes;
     private String serverName;
     private int width;
     private int height;
@@ -105,6 +107,38 @@ public class RFBConnection {
         return serverVersion;
     }
     
+    public byte[] getSecurityTypes() {
+        return securityTypes;
+    }
+
+    public void probeSecurity() throws UnknownHostException, IOException, RFBException {
+        
+        // handle our dummy RFB connection for testing
+        if ((address != null) && (address.equals(MAGIC_DEMO_HOSTNAME))) {
+            this.serverVersion = new Version(MAX_VERSION);
+            this.serverName = "demo";
+            this.width = 1024;
+            this.height = 768;
+            this.pointerX = width/2.0f;
+            this.pointerY = height/2.0f;
+            this.securityTypes = new byte[1];
+            this.securityTypes[0] = SECURITY_NONE;
+            return;
+        }
+        
+        // open the socket and exchange version information
+        establishRFBStream();
+        
+        // gather security information
+        this.securityTypes = stream.readSecurity();
+        if (securityTypes == null) {
+            throw new RFBException("error from server: "+stream.readString());
+        }
+        
+        // disconnect
+        disconnect();
+    }
+    
     public void connect() throws UnknownHostException, IOException, RFBException {
         
         if ((address != null) && (address.equals(MAGIC_DEMO_HOSTNAME))) {
@@ -114,9 +148,71 @@ public class RFBConnection {
             this.height = 768;
             this.pointerX = width/2.0f;
             this.pointerY = height/2.0f;
+            this.securityTypes = new byte[1];
+            this.securityTypes[0] = SECURITY_NONE;
             return;
         }
         
+        establishRFBStream();
+                
+        // security
+        
+        this.securityTypes = stream.readSecurity();
+        if (securityTypes == null) {
+            throw new RFBException("error from server: "+stream.readString());
+        }
+        byte clientSecurityType = 0;
+        for (byte securityType : securityTypes) {
+            if (securityType == SECURITY_NONE) {
+                // this type is preferred.
+                clientSecurityType = SECURITY_NONE;
+                break;
+            } else if (securityType == SECURITY_VNCAUTH) {
+                clientSecurityType = SECURITY_VNCAUTH;
+            }
+        }
+        if (clientSecurityType == 0) {
+            throw new RFBException("failure to negotiate security type - 1.");
+        }
+        stream.writeSecurity(clientSecurityType);
+        
+        // VNC Authentication (DES challenge-response)
+        if (clientSecurityType == SECURITY_VNCAUTH) {
+            if (password == null) {
+                throw new RFBException("the server needs a password.");
+            }
+            stream.performVncAuthentication(password);
+        }
+        
+        // read a security result... it's always sent in version 3.8.
+        // previous versions skipped the result for SECURITY_NONE.
+        int version = this.serverVersion.asInt();
+        if ((version >= 0x0308) || (clientSecurityType != SECURITY_NONE)) {
+            // read a security result.
+            if (stream.readSecurityResult() == 1) {
+                // failure
+                if (version >= 0x0308) {
+                    throw new RFBException("error from server: "+stream.readString());
+                } else {
+                    if (clientSecurityType == SECURITY_VNCAUTH) {
+                        throw new RFBException("cannot authenticate.  bad password?");
+                    } else {
+                        throw new RFBException("cannot authenticate with server.");
+                    }
+                }
+            }
+        }
+        
+        // initialization
+        Object[] oa = stream.performInitialization();
+        this.serverName = (String)oa[0];
+        this.width = (Integer)oa[1];
+        this.height = (Integer)oa[2];
+        this.pointerX = width/2.0f;
+        this.pointerY = height/2.0f;
+    }
+    
+    private void establishRFBStream() throws UnknownHostException, IOException, RFBException {
         //System.out.println("connecting...");
         if (inetAddress != null) {
             socket = new Socket(inetAddress, port);
@@ -150,61 +246,6 @@ public class RFBConnection {
             }
         }
         stream.writeVersion(version);
-        
-        // security
-        
-        byte[] securityTypes = stream.readSecurity();
-        if (securityTypes == null) {
-            throw new RFBException("error from server: "+stream.readString());
-        }
-        byte clientSecurityType = 0;
-        for (byte securityType : securityTypes) {
-            if (securityType == SECURITY_NONE) {
-                // this type is preferred.
-                clientSecurityType = SECURITY_NONE;
-                break;
-            } else if (securityType == SECURITY_VNCAUTH) {
-                clientSecurityType = SECURITY_VNCAUTH;
-            }
-        }
-        if (clientSecurityType == 0) {
-            throw new RFBException("failure to negotiate security type - 1.");
-        }
-        stream.writeSecurity(clientSecurityType);
-        
-        // VNC Authentication (DES challenge-response)
-        if (clientSecurityType == SECURITY_VNCAUTH) {
-            if (password == null) {
-                throw new RFBException("the server needs a password.");
-            }
-            stream.performVncAuthentication(password);
-        }
-        
-        // read a security result... it's always sent in version 3.8.
-        // previous versions skipped the result for SECURITY_NONE.
-        if ((version >= 0x0308) || (clientSecurityType != SECURITY_NONE)) {
-            // read a security result.
-            if (stream.readSecurityResult() == 1) {
-                // failure
-                if (version >= 0x0308) {
-                    throw new RFBException("error from server: "+stream.readString());
-                } else {
-                    if (clientSecurityType == SECURITY_VNCAUTH) {
-                        throw new RFBException("cannot authenticate.  bad password?");
-                    } else {
-                        throw new RFBException("cannot authenticate with server.");
-                    }
-                }
-            }
-        }
-        
-        // initialization
-        Object[] oa = stream.performInitialization();
-        this.serverName = (String)oa[0];
-        this.width = (Integer)oa[1];
-        this.height = (Integer)oa[2];
-        this.pointerX = width/2.0f;
-        this.pointerY = height/2.0f;
     }
     
     public void disconnect() throws IOException {
@@ -315,7 +356,7 @@ public class RFBConnection {
             // fractional changes, but only send an event when
             // the absolute accumulation is greater than 1.0.
             syAccumulator += effectiveSy;
-float sya1 = syAccumulator;
+//float sya1 = syAccumulator;
             if (Math.abs(syAccumulator) >= 1.0) {
                 yScroll = (int)syAccumulator;
                 // keep the fractional part

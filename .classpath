@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="src" path="netlib_src"/>
-	<classpathentry kind="src" path="motelib_src"/>
 	<classpathentry kind="src" path="xmlfoo_src"/>
+	<classpathentry kind="src" path="motelib_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -117,18 +117,21 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         }
         layout.addView(portEdit);       
 
-        TextView nameLabel = new TextView(context);
-        nameLabel.setText("Name used in the selection menu (optional):");
-        layout.addView(nameLabel);
+        Button button = new Button(context);
+        button.setText("Next...");
+        button.setOnClickListener(this);
+        layout.addView(button);
+        
+        ScrollView scrollView = new ScrollView(context);
+        scrollView.addView(layout);
+        addView(scrollView);
+    }
 
-        nameEdit = new EditText(context);
-        nameEdit.setSingleLine();
-        nameEdit.setHint("Default: auto-detect server name");
-        if (state.device != null) {
-            nameEdit.setText(state.device.serverName);
-        }
-        layout.addView(nameEdit);
-
+    private void createPhase2() {
+        removeAllViews();
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        
         TextView passwordLabel = new TextView(context);
         passwordLabel.setText("Enter your password:");
         layout.addView(passwordLabel);
@@ -142,6 +145,18 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         }
         layout.addView(passwordEdit);
         
+        TextView nameLabel = new TextView(context);
+        nameLabel.setText("Name used in the selection menu (optional):");
+        layout.addView(nameLabel);
+
+        nameEdit = new EditText(context);
+        nameEdit.setSingleLine();
+        nameEdit.setHint("Default: auto-detect server name");
+        if (state.device != null) {
+            nameEdit.setText(state.device.serverName);
+        }
+        layout.addView(nameEdit);
+
         ard35CompatibilityCheckbox = new CheckBox(context);
         ard35CompatibilityCheckbox.setText("Apple Remote Desktop v3.5 compatibility (needed only to make right-clicks work on Macs after the July 2011 ARD update)");
         ard35CompatibilityCheckbox.setTextSize(TypedValue.COMPLEX_UNIT_PX, passwordLabel.getTextSize());
@@ -165,10 +180,9 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         ScrollView scrollView = new ScrollView(context);
         scrollView.addView(layout);
         addView(scrollView);
-        
     }
 
-    private void createPhase2() {
+    private void createPhase3() {
         removeAllViews();
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -209,6 +223,9 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         case 2:
             createPhase2();
             break;
+        case 3:
+            createPhase3();
+            break;
         default:
             throw new RuntimeException("invalid state");
         }
@@ -224,49 +241,59 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         case 2:
             onPhase2Submit();
             break;
+        case 3:
+            onPhase3Submit();
         }
     }
     
     private void readFields() {
-        // read address
-        String address = addressEdit.getText().toString().trim();
-        if (address.length() == 0) {
-            address = null;
-        }
-        
-        // read port
-        int port = 0;
-        String portString = portEdit.getText().toString();
-        try {
-            port = Integer.parseInt(portString);
-        } catch (NumberFormatException e) {
-            port = 0;
-        }
-        if (port == 0) {
-            port = RFBConnection.DEFAULT_PORT;
-        }
-        
-        // read password
-        String password = passwordEdit.getText().toString();
-        if (password.length() == 0) {
-            password = null;
-        }
-        
-        // read name
-        String name = nameEdit.getText().toString();
-        if (name.length() == 0) {
-            name = null;
+        switch (state.state) {
+        case 1:
+            // read address
+            String address = addressEdit.getText().toString().trim();
+            if (address.length() == 0) {
+                address = null;
+            }
+            
+            // read port
+            int port = 0;
+            String portString = portEdit.getText().toString();
+            try {
+                port = Integer.parseInt(portString);
+            } catch (NumberFormatException e) {
+                port = 0;
+            }
+            if (port == 0) {
+                port = RFBConnection.DEFAULT_PORT;
+            }
+            
+            state.device.address = address;
+            state.device.port = port;
+            break;
+            
+        case 2:
+            // read password
+            String password = passwordEdit.getText().toString();
+            if (password.length() == 0) {
+                password = null;
+            }
+            
+            // read name
+            String name = nameEdit.getText().toString();
+            if (name.length() == 0) {
+                name = null;
+            }
+            
+            state.device.password = password;
+            state.device.serverName = name;
+            state.device.ard35Compatibility = ard35CompatibilityCheckbox.isChecked();
+            break;
         }
         
         // update state
         if (state.device == null) {
             state.device = new ValenceDevice(deviceClass);
         }
-        state.device.address = address;
-        state.device.port = port;
-        state.device.password = password;
-        state.device.serverName = name;
-        state.device.ard35Compatibility = ard35CompatibilityCheckbox.isChecked();
     }
     
     private void onPhase1Submit() {
@@ -298,24 +325,36 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
             }
         }
         
-        probe(state.device.address, state.device.port, state.device.password, deviceAddress);
+        probe();
     }
-    
-    private void probe(final String hostname, final int port, final String password, final InetAddress deviceAddress) {
+
+    private void onPhase2Submit() {
+        readFields();        
+        probe();
+    }
+
+    private void probe() {
         
-        // 2. probe the device
+        // probe the device
         // TODO: come up with some workable solution for connect timeouts.
         //       Maybe a timeout in the parent thread which leads to a forced Socket.close().
         final ProgressDialog progressDialog =
             ProgressDialog.show(context, "", "Connecting to the VNC server...", true, true);
         final ProbeHandler probeHandler = new ProbeHandler(progressDialog);
-        final ValenceDevice deviceTemplate = this.state.device;
+        final ValenceDevice device = this.state.device;
         Thread probeThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ValenceDevice device = deviceClass.probe(hostname, deviceAddress, port, password, deviceTemplate);
-                    Message message = probeHandler.obtainMessage(MSG_PROBE_SUCCESS, device);
+                    ValenceDeviceClass.ProbeResult probeResult;
+                    if (state.state == 1) {
+                        probeResult =
+                            deviceClass.probe(device, ValenceDeviceClass.PROBE_SECURITY);
+                    } else {
+                        probeResult =
+                            deviceClass.probe(device, ValenceDeviceClass.PROBE_AUTH);
+                    }
+                    Message message = probeHandler.obtainMessage(MSG_PROBE_SUCCESS, probeResult);
                     probeHandler.sendMessage(message);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -351,7 +390,13 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         public void handleMessage(Message message) {
             if (! valid) { return; }
             if (message.what == MSG_PROBE_SUCCESS) {
-                onSuccessfulProbe((ValenceDevice)message.obj);
+                ValenceDeviceClass.ProbeResult probeResult =
+                    (ValenceDeviceClass.ProbeResult)message.obj;
+                if (probeResult.probeType == ValenceDeviceClass.PROBE_SECURITY) {
+                    onSuccessfulSecurityProbe(probeResult);
+                } else {
+                    onSuccessfulAuthProbe(probeResult);
+                }
                 progressDialog.dismiss();
             } else if (message.what == MSG_PROBE_FAILURE) {
                 progressDialog.dismiss();
@@ -360,12 +405,23 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         }       
     }
     
-    private void onSuccessfulProbe(ValenceDevice device) {
-        this.state.device = device;
+    private void onSuccessfulSecurityProbe(ValenceDeviceClass.ProbeResult probeResult) {
+        this.state.device = probeResult.device;
+        System.out.println("security types: ");
+        for (byte type : probeResult.securityTypes) {
+            System.out.printf("    %02X\n", type);
+        }
+        // transition to the next state
         transition(2);
     }
-    
-    private void onPhase2Submit() {
+
+    private void onSuccessfulAuthProbe(ValenceDeviceClass.ProbeResult probeResult) {
+        this.state.device = probeResult.device;
+        // transition to the next state
+        transition(3);
+    }
+
+    private void onPhase3Submit() {
         if (state.isUpdate) {
             onDeviceChange.onUpdateDevice(state.device);
         } else {
@@ -385,7 +441,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
 
     @Override
     public DeviceSetupState onSaveDeviceSetupState() {
-        if (this.state.state == 1) {
+        if (this.state.state < 3) {
             readFields();
         }
         return state;

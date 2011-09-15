@@ -18,7 +18,6 @@
 package com.cafbit.valence.device;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import android.content.Context;
 import android.view.View;
@@ -34,6 +33,7 @@ import com.cafbit.netlib.ReceiverThread;
 import com.cafbit.valence.device.ValenceDeviceSetupView.ValenceDeviceSetupState;
 import com.cafbit.valence.rfb.RFBConnection;
 import com.cafbit.valence.rfb.RFBException;
+import com.cafbit.valence.rfb.Version;
 import com.cafbit.xmlfoo.annotations.SingletonCode;
 
 @SingletonCode("valence")
@@ -43,6 +43,9 @@ public class ValenceDeviceClass implements DeviceClass {
     static final String DEVICE_CODE = "valence";
     static final String DEVICE_NAME = "VNC Server";
     static final String DEVICE_DESCRIPTION = "Control your computer via VNC";
+    // probe types
+    static final int PROBE_SECURITY = 1;
+    static final int PROBE_AUTH     = 2;
 
     @Override
     public String getDeviceCode() {
@@ -69,38 +72,46 @@ public class ValenceDeviceClass implements DeviceClass {
         return new ValenceDeviceSetupView(context, (ValenceDevice) device, isUpdate, onDeviceChange, this, (ValenceDeviceSetupState) deviceSetupState);
     }
     
-    public ValenceDevice probe(final String hostname, final InetAddress address, final int port, final String password, final ValenceDevice deviceTemplate) throws IOException {
+    static class ProbeResult {
+        int probeType;
+        ValenceDevice device;
+        String serverName;
+        Version serverVersion;
+        byte[] securityTypes;
+    }
+    
+    public ProbeResult probe(final ValenceDevice device, int probeType) throws IOException {
         RFBConnection conn;
-        if (hostname.equals(RFBConnection.MAGIC_DEMO_HOSTNAME)) {
-            conn = new RFBConnection(hostname);
+        ProbeResult probeResult = new ProbeResult();
+        if (device.address.equals(RFBConnection.MAGIC_DEMO_HOSTNAME)) {
+            conn = new RFBConnection(device.address);
         } else {
-            conn = new RFBConnection(address, port, password);
+            conn = new RFBConnection(device.address, device.port, device.password);
         }
         try {
-            conn.connect();
-            conn.disconnect();
+            if (probeType == PROBE_SECURITY) {
+                conn.probeSecurity();
+            } else if (probeType == PROBE_AUTH) {
+                conn.connect();
+                conn.disconnect();
+            }
         } catch (RFBException e) {
             throw new IOException(e.getMessage());
         }
         
-        // construct a Device object
-        ValenceDevice device;
-        if (deviceTemplate != null) {
-            device = deviceTemplate;
-        } else {
-            device = new ValenceDevice();
-        }
-
+        probeResult.probeType = probeType;
+        probeResult.device = device;
+        probeResult.serverName = conn.getServerName();
+        probeResult.serverVersion = conn.getServerVersion();
+        probeResult.securityTypes = conn.getSecurityTypes();
+        
         device.deviceClass = this;
-        device.address = hostname;
-        device.port = port;
         if ((device.serverName == null) || (device.serverName.length()==0)) {
             device.serverName = conn.getServerName();
         }
         device.serverVersion = conn.getServerVersion().toString();
-        device.password = password;
         
-        return device;
+        return probeResult;
     }
 
     @Override
