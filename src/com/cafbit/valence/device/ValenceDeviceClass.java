@@ -33,6 +33,9 @@ import com.cafbit.netlib.ReceiverThread;
 import com.cafbit.valence.device.ValenceDeviceSetupView.ValenceDeviceSetupState;
 import com.cafbit.valence.rfb.RFBConnection;
 import com.cafbit.valence.rfb.RFBException;
+import com.cafbit.valence.rfb.RFBSecurity;
+import com.cafbit.valence.rfb.RFBSecurityARD;
+import com.cafbit.valence.rfb.RFBSecurityVNC;
 import com.cafbit.valence.rfb.Version;
 import com.cafbit.xmlfoo.annotations.SingletonCode;
 
@@ -81,12 +84,24 @@ public class ValenceDeviceClass implements DeviceClass {
     }
     
     public ProbeResult probe(final ValenceDevice device, int probeType) throws IOException {
+        
+        // create the appropriate RFBSecurity object for this connection
+        RFBSecurity security;
+        if (device.macAuthentication) {
+            security = new RFBSecurityARD(device.username, device.password);
+        } else {
+            security = new RFBSecurityVNC(device.password);
+        }
+// TODO: remove this...
+// short-circuit mac auth
+//security = new RFBSecurityVNC(device.password);
+        
         RFBConnection conn;
         ProbeResult probeResult = new ProbeResult();
         if (device.address.equals(RFBConnection.MAGIC_DEMO_HOSTNAME)) {
             conn = new RFBConnection(device.address);
         } else {
-            conn = new RFBConnection(device.address, device.port, device.password);
+            conn = new RFBConnection(device.address, device.port, security);
         }
         try {
             if (probeType == PROBE_SECURITY) {

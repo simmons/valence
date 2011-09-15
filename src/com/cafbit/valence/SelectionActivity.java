@@ -66,6 +66,12 @@ public class SelectionActivity extends DevicesActivity {
         if (device.ard35Compatibility) {
             builder.appendQueryParameter("ard35Compatibility", "true");
         }
+        if (device.macAuthentication) {
+            builder.appendQueryParameter("macAuthentication", "true");
+        }
+        if ((device.username != null) && (device.username.length() > 0)) {
+            builder.appendQueryParameter("username", device.username);
+        }
         Uri uri = builder.build();
         uri.getPort();
         intent.setData(uri);

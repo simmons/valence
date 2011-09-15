@@ -46,7 +46,7 @@ public class RFBStream {
         return null;
     }
     
-    private byte[] read(int length) throws IOException {
+    byte[] read(int length) throws IOException {
 
         byte[] buffer = new byte[length];
         int pos = 0;
@@ -63,31 +63,33 @@ public class RFBStream {
         return buffer;
     }
 
-    private int readByte() throws IOException {
+    int readByte() throws IOException {
         byte[] ba = read(1);
         return ba[0];
     }
-    private int readInt() throws IOException {
+    int readShort() throws IOException {
+        byte[] ba = read(2);
+        return (0xFF & (int)ba[0])<<8 | (0xFF & (int)ba[1])<<0;
+    }
+    int readInt() throws IOException {
         byte[] ba = read(4);
         return ba[0]<<24 | ba[1]<<16 | ba[2]<<8 | ba[3];
     }
-    public String readString() throws IOException {
+    String readString() throws IOException {
         int length = readInt();
         byte[] buffer = read(length);
         return new String(buffer, "ASCII");
     }
     
-    private void write(byte[] ba) throws IOException {
+    void write(byte[] ba) throws IOException {
         //System.out.println("write:\n"+Util.hexDump(ba));
         outputStream.write(ba);
     }
-    
-    private void writeByte(int b) throws IOException {
+    void writeByte(int b) throws IOException {
         //byte[] ba = new byte[1]; ba[0] = (byte)b; System.out.println("write:\n"+Util.hexDump(ba));
         outputStream.write(b);
     }
-    
-    private void write(RFBMessage message) throws IOException {
+    void write(RFBMessage message) throws IOException {
         //System.out.println("write:\n"+Util.hexDump(message.getBytes()));
         outputStream.write(message.getBytes());
     }
@@ -133,12 +135,6 @@ public class RFBStream {
         return readInt();
     }
     
-    public void performVncAuthentication(String password) throws IOException {
-        byte challenge[] = read(16);
-        byte response[] = DES.encrypt(challenge, password);
-        write(response);
-    }
-
     public Object[] performInitialization() throws IOException {
         // send ClientInit: shared-flag = 1;
         writeByte(0x01);

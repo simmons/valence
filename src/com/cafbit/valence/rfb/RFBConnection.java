@@ -40,7 +40,7 @@ public class RFBConnection {
     private String address;
     private InetAddress inetAddress;
     private int port;
-    private String password;
+    private RFBSecurity security;
     private Socket socket = null;
     private RFBStream stream = null;
     private Version serverVersion;
@@ -55,39 +55,63 @@ public class RFBConnection {
     public RFBConnection(String address, int port, String password) {
         this.address = address;
         this.port = port;
-        this.password = password;
+        this.security = new RFBSecurityVNC(password);
     }
     
     public RFBConnection(String address, String password) {
         this.address = address;
         this.port = DEFAULT_PORT;
-        this.password = password;
+        this.security = new RFBSecurityVNC(password);
     }
 
     public RFBConnection(String address) {
         this.address = address;
         this.port = DEFAULT_PORT;
-        this.password = null;
+        this.security = new RFBSecurityNone();
     }
 
     public RFBConnection(InetAddress address, int port, String password) {
         this.inetAddress = address;
         this.port = port;
-        this.password = password;
+        this.security = new RFBSecurityVNC(password);
     }
     
     public RFBConnection(InetAddress address, String password) {
         this.inetAddress = address;
         this.port = DEFAULT_PORT;
-        this.password = password;
+        this.security = new RFBSecurityVNC(password);
     }
 
     public RFBConnection(InetAddress address) {
         this.inetAddress = address;
         this.port = DEFAULT_PORT;
-        this.password = null;
+        this.security = new RFBSecurityNone();
+    }
+
+    public RFBConnection(String address, int port, RFBSecurity security) {
+        this.address = address;
+        this.port = port;
+        this.security = security;
     }
     
+    public RFBConnection(String address, RFBSecurity security) {
+        this.address = address;
+        this.port = DEFAULT_PORT;
+        this.security = security;
+    }
+
+    public RFBConnection(InetAddress address, int port, RFBSecurity security) {
+        this.inetAddress = address;
+        this.port = port;
+        this.security = security;
+    }
+    
+    public RFBConnection(InetAddress address, RFBSecurity security) {
+        this.inetAddress = address;
+        this.port = DEFAULT_PORT;
+        this.security = security;
+    }
+
     public void setArd35Compatibility(boolean ard35Compatibility) {
         this.ard35Compatibility = ard35Compatibility;
     }
@@ -156,53 +180,54 @@ public class RFBConnection {
         establishRFBStream();
                 
         // security
-        
+
+        // read the list of supported security types from the server
         this.securityTypes = stream.readSecurity();
         if (securityTypes == null) {
             throw new RFBException("error from server: "+stream.readString());
         }
-        byte clientSecurityType = 0;
+        // determine if the server supports our preferred security type,
+        // and/or "None" security.
+        boolean securityNoneIsAvailable = false;
+        boolean preferredSecurityIsAvailable = false;
         for (byte securityType : securityTypes) {
             if (securityType == SECURITY_NONE) {
-                // this type is preferred.
-                clientSecurityType = SECURITY_NONE;
-                break;
-            } else if (securityType == SECURITY_VNCAUTH) {
-                clientSecurityType = SECURITY_VNCAUTH;
+                securityNoneIsAvailable = true;
+            }
+            if (security.getType() == securityType) {
+                preferredSecurityIsAvailable = true;
             }
         }
-        if (clientSecurityType == 0) {
-            throw new RFBException("failure to negotiate security type - 1.");
+        // if the preferred security type is not available,
+        // fall back to "None", if the server supports it.
+        if (! preferredSecurityIsAvailable) {
+            if (securityNoneIsAvailable) {
+                security = new RFBSecurityNone();
+            } else {
+                throw new RFBException("The server does not support security type \""+security.getTypeName()+"\"");
+            } 
         }
-        stream.writeSecurity(clientSecurityType);
+        // tell the server which security type we'll be using.
+        stream.writeSecurity(security.getType());
         
-        // VNC Authentication (DES challenge-response)
-        if (clientSecurityType == SECURITY_VNCAUTH) {
-            if (password == null) {
-                throw new RFBException("the server needs a password.");
-            }
-            stream.performVncAuthentication(password);
-        }
+        // perform the security handshake
+        security.perform(stream);
         
         // read a security result... it's always sent in version 3.8.
         // previous versions skipped the result for SECURITY_NONE.
         int version = this.serverVersion.asInt();
-        if ((version >= 0x0308) || (clientSecurityType != SECURITY_NONE)) {
+        if ((version >= 0x0308) || (! (security instanceof RFBSecurityNone))) {
             // read a security result.
             if (stream.readSecurityResult() == 1) {
                 // failure
                 if (version >= 0x0308) {
                     throw new RFBException("error from server: "+stream.readString());
                 } else {
-                    if (clientSecurityType == SECURITY_VNCAUTH) {
-                        throw new RFBException("cannot authenticate.  bad password?");
-                    } else {
-                        throw new RFBException("cannot authenticate with server.");
-                    }
+                    throw new RFBException("cannot authenticate with server.");
                 }
             }
         }
-        
+
         // initialization
         Object[] oa = stream.performInitialization();
         this.serverName = (String)oa[0];

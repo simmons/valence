@@ -32,6 +32,8 @@ public class ValenceDevice extends Device {
     @LameCrypt
     public String password;
     public boolean ard35Compatibility = false;
+    public boolean macAuthentication = false;
+    public String username;
     
     public ValenceDevice() {
     }

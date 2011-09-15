@@ -28,6 +28,7 @@ import android.util.Log;
 import com.cafbit.valence.ValenceActivity.ValenceHandler;
 import com.cafbit.valence.rfb.RFBConnection;
 import com.cafbit.valence.rfb.RFBEvent;
+import com.cafbit.valence.rfb.RFBSecurity;
 
 public class RFBThread extends Thread {
     
@@ -42,42 +43,18 @@ public class RFBThread extends Thread {
     private RFBRecvThread recvThread;
     private boolean connected = false;
     
-    public RFBThread(ValenceHandler handler, String address, int port, String password) {
+    public RFBThread(ValenceHandler handler, String address, int port, RFBSecurity security) {
         this.parentHandler = handler;
-        this.conn = new RFBConnection(address, port, password);
+        this.conn = new RFBConnection(address, port, security);
         setName("rfb-"+(serial++));
     }
     
-    public RFBThread(ValenceHandler handler, String address, String password) {
+    public RFBThread(ValenceHandler handler, String address, RFBSecurity security) {
         this.parentHandler = handler;
-        this.conn = new RFBConnection(address, password);
+        this.conn = new RFBConnection(address, security);
         setName("rfb-"+(serial++));
     }
 
-    public RFBThread(ValenceHandler handler, String address) {
-        this.parentHandler = handler;
-        this.conn = new RFBConnection(address);
-        setName("rfb-"+(serial++));
-    }
-
-    public RFBThread(ValenceHandler handler, InetAddress address, int port, String password) {
-        this.parentHandler = handler;
-        this.conn = new RFBConnection(address, port, password);
-        setName("rfb-"+(serial++));
-    }
-    
-    public RFBThread(ValenceHandler handler, InetAddress address, String password) {
-        this.parentHandler = handler;
-        this.conn = new RFBConnection(address, password);
-        setName("rfb-"+(serial++));
-    }
-
-    public RFBThread(ValenceHandler handler, InetAddress address) {
-        this.parentHandler = handler;
-        this.conn = new RFBConnection(address);
-        setName("rfb-"+(serial++));
-    }
-    
     public void setArd35Compatibility(boolean ard35Compatibility) {
         this.conn.setArd35Compatibility(ard35Compatibility);
     }

@@ -17,6 +17,7 @@
 
 package com.cafbit.valence;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 //import com.cafbit.motelib.R;
@@ -24,6 +25,9 @@ import com.cafbit.valence.RFBThread.RFBThreadHandler;
 import com.cafbit.valence.TouchPadView.OnTouchPadEventListener;
 import com.cafbit.valence.rfb.RFBKeyEvent;
 import com.cafbit.valence.rfb.RFBPointerEvent;
+import com.cafbit.valence.rfb.RFBSecurity;
+import com.cafbit.valence.rfb.RFBSecurityARD;
+import com.cafbit.valence.rfb.RFBSecurityVNC;
 import com.cafbit.valence.rfb.RFBKeyEvent.SpecialKey;
 
 import android.app.Activity;
@@ -57,10 +61,17 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     private static final String TAG = "Valence";
     
     private ValenceHandler handler = new ValenceHandlerImpl();
+    
+    // TODO: consider marshaling the ValenceDevice object into the
+    // activity using Parcels or some such, instead of (or in addition
+    // to) using the URL approach.
     private String address;
     private int port;
     private String password;
     private boolean ard35Compatibility = false;
+    private boolean macAuthentication = false;
+    private String username;
+    
     private RFBThread rfbThread;
     private boolean isRunning = false;
     private InputMethodManager inputMethodManager;
@@ -93,6 +104,11 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             (uri.getQueryParameter("ard35Compatibility").equals("true"))) {
             this.ard35Compatibility = true;
         }
+        if ((uri.getQueryParameter("macAuthentication") != null) &&
+            (uri.getQueryParameter("macAuthentication").equals("true"))) {
+            this.macAuthentication = true;
+        }
+        this.username = uri.getQueryParameter("username");
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -334,10 +350,19 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         if (rfbThread != null) {
             Log.e(TAG, "rfbThread should be null!");
         }
-        if (port != -1) {
-            rfbThread = new RFBThread(handler, address, port, password);
+        
+        // create the appropriate RFBSecurity object for this connection
+        RFBSecurity security;
+        if (macAuthentication) {
+            security = new RFBSecurityARD(username, password);
         } else {
-            rfbThread = new RFBThread(handler, address, password);
+            security = new RFBSecurityVNC(password);
+        }
+        
+        if (port != -1) {
+            rfbThread = new RFBThread(handler, address, port, security);
+        } else {
+            rfbThread = new RFBThread(handler, address, security);
         }
         if (ard35Compatibility) {
             rfbThread.setArd35Compatibility(true);
@@ -548,6 +573,9 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             case MSG_ERROR:
                 finishOnAlert = true;
                 String text;
+                if (msg.obj instanceof IOException) {
+                    msg.obj = new ValenceIOException((IOException)msg.obj);
+                }
                 if (msg.obj instanceof UnknownHostException) {
                     text = "unknown host: "+((Throwable)msg.obj).getMessage();
                 } else {
