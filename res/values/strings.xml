@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Valence</string>
-    <string name="about_version">Version: 1.2</string>
-    <string name="about_build_date">Build: 2011-08-28</string>
+    <string name="about_version">Version: 1.3</string>
+    <string name="about_build_date">Build: 2011-09-19</string>
     <string name="about_copyright">© 2011 David Simmons</string>
     <string name="about_url">http://cafbit.com/</string>
     <string name="about_description">

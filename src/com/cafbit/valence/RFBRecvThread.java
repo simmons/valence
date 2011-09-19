@@ -24,21 +24,21 @@ import com.cafbit.valence.RFBThread.RFBThreadHandler;
 public class RFBRecvThread extends Thread {
 
     private static int serial = 0;
-    
+
     private RFBThreadHandler parentHandler;
     private Socket socket;
     private boolean valid = true;
-    
+
     public RFBRecvThread(RFBThreadHandler handler, Socket socket) {
         this.parentHandler = handler;
         this.socket = socket;
         setName("rfbrecv-"+(serial++));
     }
-    
+
     public void invalidate() {
         valid = false;
     }
-    
+
     @Override
     public void run() {
         if (socket == null) {
@@ -65,5 +65,5 @@ public class RFBRecvThread extends Thread {
             }
         }
     }
-    
+
 }

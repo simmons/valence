@@ -30,10 +30,10 @@ public class RFBConnection {
     public static final byte SECURITY_NONE    = 0x01;
     public static final byte SECURITY_VNCAUTH = 0x02;
     public static final byte SECURITY_ARD     = 0x1E;
-    
+
     public static final int DEFAULT_PORT = 5900;
     public static final String MAGIC_DEMO_HOSTNAME = "demo.local";
-    private static final int TIMEOUT = 4000;
+    private static final int TIMEOUT = 8000;
     private static final int MAX_VERSION = 0x0308;
     private static final int MIN_VERSION = 0x0303;
 
@@ -57,7 +57,7 @@ public class RFBConnection {
         this.port = port;
         this.security = new RFBSecurityVNC(password);
     }
-    
+
     public RFBConnection(String address, String password) {
         this.address = address;
         this.port = DEFAULT_PORT;
@@ -75,7 +75,7 @@ public class RFBConnection {
         this.port = port;
         this.security = new RFBSecurityVNC(password);
     }
-    
+
     public RFBConnection(InetAddress address, String password) {
         this.inetAddress = address;
         this.port = DEFAULT_PORT;
@@ -93,7 +93,7 @@ public class RFBConnection {
         this.port = port;
         this.security = security;
     }
-    
+
     public RFBConnection(String address, RFBSecurity security) {
         this.address = address;
         this.port = DEFAULT_PORT;
@@ -105,7 +105,7 @@ public class RFBConnection {
         this.port = port;
         this.security = security;
     }
-    
+
     public RFBConnection(InetAddress address, RFBSecurity security) {
         this.inetAddress = address;
         this.port = DEFAULT_PORT;
@@ -118,25 +118,25 @@ public class RFBConnection {
     public boolean getArd35Compatibility() {
         return ard35Compatibility;
     }
-    
+
     public Socket getSocket() {
         return socket;
     }
-    
+
     public String getServerName() {
         return serverName;
     }
-    
+
     public Version getServerVersion() {
         return serverVersion;
     }
-    
+
     public byte[] getSecurityTypes() {
         return securityTypes;
     }
 
     public void probeSecurity() throws UnknownHostException, IOException, RFBException {
-        
+
         // handle our dummy RFB connection for testing
         if ((address != null) && (address.equals(MAGIC_DEMO_HOSTNAME))) {
             this.serverVersion = new Version(MAX_VERSION);
@@ -149,22 +149,22 @@ public class RFBConnection {
             this.securityTypes[0] = SECURITY_NONE;
             return;
         }
-        
+
         // open the socket and exchange version information
         establishRFBStream();
-        
+
         // gather security information
         this.securityTypes = stream.readSecurity();
         if (securityTypes == null) {
             throw new RFBException("error from server: "+stream.readString());
         }
-        
+
         // disconnect
         disconnect();
     }
-    
+
     public void connect() throws UnknownHostException, IOException, RFBException {
-        
+
         if ((address != null) && (address.equals(MAGIC_DEMO_HOSTNAME))) {
             this.serverVersion = new Version(MAX_VERSION);
             this.serverName = "demo";
@@ -176,9 +176,9 @@ public class RFBConnection {
             this.securityTypes[0] = SECURITY_NONE;
             return;
         }
-        
+
         establishRFBStream();
-                
+
         // security
 
         // read the list of supported security types from the server
@@ -205,14 +205,14 @@ public class RFBConnection {
                 security = new RFBSecurityNone();
             } else {
                 throw new RFBException("The server does not support security type \""+security.getTypeName()+"\"");
-            } 
+            }
         }
         // tell the server which security type we'll be using.
         stream.writeSecurity(security.getType());
-        
+
         // perform the security handshake
         security.perform(stream);
-        
+
         // read a security result... it's always sent in version 3.8.
         // previous versions skipped the result for SECURITY_NONE.
         int version = this.serverVersion.asInt();
@@ -236,7 +236,7 @@ public class RFBConnection {
         this.pointerX = width/2.0f;
         this.pointerY = height/2.0f;
     }
-    
+
     private void establishRFBStream() throws UnknownHostException, IOException, RFBException {
         //System.out.println("connecting...");
         if (inetAddress != null) {
@@ -251,7 +251,7 @@ public class RFBConnection {
 
         this.stream = new RFBStream(socket.getInputStream(), socket.getOutputStream());
         //System.out.println("reading from the RFB socket...");
-        
+
         // version
 
         this.serverVersion = stream.readVersion();
@@ -272,7 +272,7 @@ public class RFBConnection {
         }
         stream.writeVersion(version);
     }
-    
+
     public void disconnect() throws IOException {
         if (socket != null) {
             socket.shutdownOutput();
@@ -280,9 +280,9 @@ public class RFBConnection {
             socket = null;
         }
     }
-    
+
     // event handling
-    
+
     /**
      * Dispatch incoming events
      */
@@ -296,7 +296,7 @@ public class RFBConnection {
             handlePointerEvent((RFBPointerEvent)event);
         }
     }
-    
+
     private void sendKey(RFBKeyEvent keyEvent) throws IOException {
         stream.sendKey(keyEvent);
     }
@@ -304,7 +304,7 @@ public class RFBConnection {
     private float syAccumulator = 0.0f;
     private void handlePointerEvent(RFBPointerEvent rpe) throws IOException {
         float distance=0.0f, speed=0.0f;
-        
+
         // handle movement
         if (rpe.dt > 0 && (rpe.dx != 0.0f || rpe.dy != 0.0f)) {
             // calculate speed
@@ -315,7 +315,7 @@ public class RFBConnection {
             } else if (speed < 0.1f) {
                 speed = 0.1f;
             }
-            
+
             // TODO TODO TODO
             // The following is an experiment in alternative speed-scaling formulas...
             /*
@@ -340,7 +340,7 @@ public class RFBConnection {
 
             pointerX += (rpe.dx*speed);
             pointerY += (rpe.dy*speed);
-            
+
             if (pointerX >= width) {
                 pointerX = width-1;
             }
@@ -354,7 +354,7 @@ public class RFBConnection {
                 pointerY = 0;
             }
         }
-        
+
         // handle buttons
         byte buttons = 0x00;
         if (rpe.button1) {
@@ -370,7 +370,7 @@ public class RFBConnection {
                 buttons |= 0x04;
             }
         }
-        
+
         // process scroll events
         // TODO: support horizontal scrolling
         int yScroll = 0;
@@ -386,7 +386,7 @@ public class RFBConnection {
                 yScroll = (int)syAccumulator;
                 // keep the fractional part
                 syAccumulator = syAccumulator - yScroll;
-                
+
                 // clamp the yScroll
                 if (yScroll < -20) {
                     yScroll = -20;
@@ -408,7 +408,7 @@ public class RFBConnection {
             } else if (yScroll < 0) {
                 buttons |= 0x10;
             }
-            
+
             byte clearScrollButtons = buttons;
             clearScrollButtons &= (~(0x08 | 0x10));
             /*

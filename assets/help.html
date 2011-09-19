@@ -1,16 +1,43 @@
 <html>
 <head>
 <title>Valence</title>
+<style>
+table.tabdata {
+    border-width: thin;
+    border-style: outset;
+    border-spacing: 0px;
+}
+table.tabdata td {
+    border-width: thin;
+    border-style: outset;
+    padding: 2px;
+    font-size: 90%;
+    color: #222;
+}
+table.tabdata thead td {
+    background-color: #f0fff0
+}
+table.tabdata tbody td {
+    background-color: #f0f0ff
+}
+blockquote {
+    background-color: #f0f0ff;
+    padding: 10px;
+    border: 2px solid #000;
+}
+
+</style>
 </head>
 <body>
 <img src="file:///android_res/drawable/icon.png"></img>
 <h1>Valence</h1>
 
-<p>Version 1.1, released August 27, 2011</p>
+<p>Version 1.3, released September 19, 2011</p>
 <p>© 2011 David Simmons</p>
 <p><tt><a href="http://cafbit.com/">http://cafbit.com/</a></tt></p> 
 
 <ul>
+<li><a href="#history">Revision history</a></li>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#installing">Installing a VNC server on your computer</a></li>
 <li><a href="#configuring">Configuring <em>Valence</em></a></li>
@@ -19,12 +46,59 @@
 <li><a href="#misc">Miscellaneous comments</a></li>
 </ul>
 
+<a name="history"></a>
+<h2>Revision history</h2>
+
+<table class="tabdata">
+<thead>
+<tr>
+<td>version</td>
+<td>date</td>
+<td>changes</td>
+</tr>
+</thead>
+<tbody>
+
+<tr> <td>v1.3</td> <td>2011-09-19</td>
+<td>
+Adding support for "Mac authentication" when connecting to Apple Remote
+Desktop, the built-in VNC server in Mac OS X.  This is required to use
+Valence with Mac OS X 10.7 Lion.
+</td>
+</tr>
+
+<tr> <td>v1.2</td> <td>2011-09-06</td>
+<td>
+Apple recently pushed an update for Apple Remote Desktop v3.5 to Snow
+Leopard users which breaks right-clicking in VNC. I added an option to
+the VNC server configuration for "ARD v3.5 compatibility" which will
+allow right-clicking to work again on Macs with this update.
+</td>
+</tr>
+
+<tr> <td>v1.1</td> <td>2011-08-27</td>
+<td>
+Fixed a critical bug that was preventing two-finger taps and swipes from
+working on certain devices, including the Samsung Epic 4G and the
+Samsung Galaxy S II.
+</td>
+</tr>
+
+<tr> <td>v1.0</td> <td>2011-07-17</td>
+<td>
+Initial release to the Android Market.
+</td>
+</tr>
+
+</tbody>
+<table>
+
 <a name="introduction"></a>
 <h2>Introduction</h2>
 
 <p>
 <em>Valence</em> turns your Android phone or tablet into a remote
-keyboard and mouse for any computer.  The inspiration for <em>Valence</em>
+keyboard and mouse for any computer.  The inspiration for Valence
 was a need to control a home theater PC from the couch, but it can be
 useful in any situation where a computer doesn't have a keyboard and
 mouse handy.  Your computer must be reachable over the network from
@@ -37,12 +111,12 @@ be running special software, unique to the app, that relays mouse and
 keyboard events to the operating system.  Not only does this add yet
 another single-purpose ever-running program to your computer, but the
 author may not have support for your operating system yet.  To solve
-this problem, <em>Valence</em> uses the industry standard
+this problem, Valence uses the industry standard
 <a href="http://en.wikipedia.org/wiki/Virtual_Network_Computing">VNC</a>
 system and its <a href="http://en.wikipedia.org/wiki/RFB_protocol">RFB</a>
 (remote framebuffer) protocol.  Many operating systems come with VNC
 built-in, and many people may already have VNC installed and enabled.
-Instead of using VNC to see the screen of a remote computer, <em>Valence</em>
+Instead of using VNC to see the screen of a remote computer, Valence
 uses VNC in a strictly one-way fashion&mdash;input events are
 transmitted from the Android handset to the VNC server, but video
 frames are never sent from the server to the handset.
@@ -52,32 +126,76 @@ frames are never sent from the server to the handset.
 <h2>Installing a VNC server on your computer</h2>
 
 <p>
-To use <em>Valence</em>, make sure you have VNC server software installed on
+To use Valence, make sure you have VNC server software installed on
 your computer, and configured to allow connections:
 </p>
 
-<ul>
-<li>
-<em>Mac OS</em>.  Macs have built-in VNC software, so no additional
-software needs to be installed.  In "System Preferences," go to the
-"Sharing" tab and make sure "Remote Management" is selected.  Then click
-"Computer Settings..." and make sure "VNC viewers may control screen
-with password" is selected, and provide a password.
-NOTE: Apple has been fiddling with their VNC support lately.
-An update pushed to Snow Leopard in July 2011 breaks right-click support,
-and Valence is likely to not work with Lion at all.  I'll try to work around
-these problems in future releases.
-</li>
-<li>
-<em>Ubuntu Linux</em>.  Ubuntu Linux has built-in VNC software, so no
+<p><b><u>Mac OS X 10.6 Snow Leopard</u></b></p>
+
+<p>
+Macs have built-in VNC software, so no additional software needs to be
+installed.
+</p>
+
+<ol>
+<li>In "System Preferences," go to the "Sharing" tab and make
+sure "Remote Management" is selected.</li>
+<li>Click "Computer Settings...", make sure "VNC viewers may control
+screen with password" is selected, and provide a password.</li>
+<li>When configuring this server in Valence, do not select "Mac
+authentication."  If you prefer to use "Mac authentication," you'll need
+to follow the directions for Lion, below.
+</ol>
+
+<blockquote>
+<b>NOTE:</b> In July 2011, Apple pushed an update to Snow Leopard users
+which included a newer version of Apple Remote Desktop, the built-in VNC
+server.  This new version, v3.5, breaks Valence's support for sending
+a right-click when you two-finger tap.  To restore right-click support,
+be sure to check the "Send mouse button-2 instead of button-3" option when
+configuring this server in Valence.
+</blockquote>
+
+<p><b><u>Mac OS X 10.7 Lion</u></b></p>
+
+<p>
+Macs have built-in VNC software, so no additional software needs to be
+installed.
+</p>
+
+<ol>
+<li>In "System Preferences," go to the "Sharing" tab and make
+sure "Remote Management" is selected.</li>
+<li>Click "Options..." and make sure "Observe" and "Control"
+are selected.</li>
+<li>When configuring this server in Valence, select "Mac authentication"
+and provide your username.</li>
+</ol>
+
+<blockquote>
+<b>NOTE:</b> Valence cannot use standard VNC authentication to connect
+to the built-in VNC server in Lion.  <em>You must use Mac
+authentication.</em>  Starting with Lion, Apple Remote Desktop presents a
+special login screen to users connecting with standard VNC
+authentication, which you cannot see with an input-only VNC client such
+as Valence.
+</blockquote>
+
+<p><b><u>Ubuntu Linux</u></b></p>
+
+<p>
+Ubuntu Linux has built-in VNC software, so no
 additional software needs to be installed.  In the System menu, select
 Preferences then Remote Desktop.  Check "Allow other users to view your
 desktop" and "Allow other users to control your desktop," uncheck "You
 must confirm each access to this machine," and check "Require the user
 to enter this password."  Assign a password.
-</li>
-<li>
-<em>Windows</em>.  Windows does not have a built-in VNC server, so
+</p>
+
+<p><b><u>Windows</u></b></p>
+
+<p>
+Windows does not have a built-in VNC server, so
 you'll need to install one.  I recommend downloading the latest version
 of <a href="http://www.tightvnc.com/">TightVNC</a>.  On TightVNC's
 <a href="http://www.tightvnc.com/download.php">download page</a>,
@@ -86,16 +204,15 @@ Open the downloaded package, click "Run," and proceed through the setup
 wizard.  (Just keep hitting "Next" and "I agree".)
 Enter a password when prompted in the "Service Configuration" dialog,
 click "Install," and complete the installation.
-</li>
-</ul>
+</p>
 
 <a name="configuring"></a>
 <h2>Configuring <em>Valence</em></h2>
 
 <p>
-Before using <em>Valence</em>, you must configure the app with information
+Before using Valence, you must configure the app with information
 about the computer you wish to control.  There are two ways to do this.
-When you first launch <em>Valence</em>, you will be presented with a list
+When you first launch Valence, you will be presented with a list
 of configured VNC servers, the option to manually add a new server, and the
 option to automatically discover VNC servers.
 </p>
@@ -104,7 +221,7 @@ option to automatically discover VNC servers.
 <li>
 <em>Manually add a VNC server</em>.  Select "Add a new VNC server...".  Enter
 the IP address or hostname of your VNC server and the password, then click
-"Connect."  The server will then be configured in <em>Valence</em>.
+"Connect."  The server will then be configured in Valence.
 </li>
 <li>
 <em>Discover a VNC server</em>.  Select "Discover VNC servers...".  VNC servers
@@ -113,7 +230,7 @@ list.  (Note: Not all VNC servers support this feature&mdash;in particular,
 TightVNC does not.  Also, some Android handsets such as the HTC EVO 4G have
 trouble performing discovery.)  Select the desired server from the list, and
 you will be presented with a server configuration screen.  Enter your password,
-click "Connect," and the server will be configured in <em>Valence</em>.
+click "Connect," and the server will be configured in Valence.
 </li>
 </ul>
 
@@ -122,7 +239,7 @@ click "Connect," and the server will be configured in <em>Valence</em>.
 
 <p>
 To control a computer, select its name from the list which appears when you
-launch <em>Valence</em>.  After connecting, you will see a large touchpad
+launch Valence.  After connecting, you will see a large touchpad
 area on the screen.  You can use this touchpad to move the mouse pointer of
 the computer in much the same way you use a touchpad on a laptop&mdash;swipe
 your finger in the direction you want the pointer to move.  To click the
@@ -151,14 +268,14 @@ the clear.  However, security-conscious users should note the following:
 <li>
 Keys and mouse movements <em>are</em> transmitted in the clear.
 Therefore, if you type a password on your computer via a VNC session,
-that password will be sent in the clear.  If you only use <em>Valence</em>
+that password will be sent in the clear.  If you only use Valence
 on your home network with a WPA-secured wireless access point, this
 is probably acceptable since everything is being encrypted by your
 wireless network.
 </li>
 <li>
-<em>Valence</em> stores your VNC passwords on your Android device in
-an encrypted format.  However, since it is necessary for <em>Valence</em>
+Valence stores your VNC passwords on your Android device in
+an encrypted format.  However, since it is necessary for Valence
 itself to possess the means to decrypt these passwords, this
 is only a deterrent to the most casual snooping.  A determined and
 skilled criminal with physical access to your phone could still
@@ -179,7 +296,7 @@ refers to an atom's capacity for joining with other atoms to form
 compounds by sharing electrons.  This connection of atoms using their
 <em>valence electrons</em> is called a <em>covalent bond</em>.
 In much the same way that valence helps hold the universe together,
-I hope that <em>Valence</em> helps bring your home electronics together.
+I hope that Valence helps bring your home electronics together.
 </p>
 
 </body>

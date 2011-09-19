@@ -45,7 +45,7 @@ public class SelectionActivity extends DevicesActivity {
         //System.out.println("URI: "+uri);
         intent.setData(uri);
         startActivity(intent);
-        
+
     }
     */
 
@@ -77,7 +77,7 @@ public class SelectionActivity extends DevicesActivity {
         intent.setData(uri);
         startActivity(intent);
     }
-    
+
     protected void onAddNewDevice() {
         Intent intent = new Intent(this, AddDeviceActivity.class);
         intent.putExtra("device_class", "valence");
@@ -92,16 +92,16 @@ public class SelectionActivity extends DevicesActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         return OptionsMenuHelper.onCreateOptionsMenu(this, menu);
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean result = OptionsMenuHelper.onOptionsItemSelected(this, item);
         if (result) {
             return true;
         } else {
-            return super.onOptionsItemSelected(item);           
+            return super.onOptionsItemSelected(item);
         }
     }
-    
+
 
 }

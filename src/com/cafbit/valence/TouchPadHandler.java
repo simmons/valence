@@ -24,10 +24,10 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class TouchPadHandler {
-    
+
     private static final int TAP_TIME_THRESHOLD = 250; // 250ms
     private static final float TAP_DISTANCE_THRESHOLD = 6.0f;
-    
+
     private float xdpi;
     private float ydpi;
     private long lastTapTime = 0L;
@@ -38,7 +38,7 @@ public class TouchPadHandler {
      * down to up.  This class tracks the state of such touches and
      * performs some simple dt/dx/dy calculations for the most recent
      * motion event.
-     * 
+     *
      * Note that a useful gesture may require multiple touches --
      * for example, a "drag" requires two touches: a tap, then a
      * swipe.  Therefore, some small amount of state must be maintained
@@ -86,13 +86,13 @@ public class TouchPadHandler {
                 multiTouch = true;
             }
         }
-        
+
         public void move(NormalMotionEvent nme) {
             // normalize absolutes against the dpi
             long nt = nme.t;
             float nx = nme.x * 100.0f / xdpi;
             float ny = nme.y * 100.0f / ydpi;
-            
+
             // calculate deltas - unless this is a transition
             // from multi-pointer to 1-pointer
             if (nme.pc == 1 && pc > 1) {
@@ -105,19 +105,19 @@ public class TouchPadHandler {
                 dx = nx - x;
                 dy = ny - y;
             }
-            
+
             // update absolutes
             t = nt;
             x = nx;
             y = ny;
-            
+
             // update pointer count
             pc = nme.pc;
-            
+
             // update aggregates
             d = FloatMath.sqrt(dx*dx+dy*dy);
             totalDistance += d;
-            
+
             if (pc > 1) {
                 multiTouch = true;
                 handleScroll(nme);
@@ -130,7 +130,7 @@ public class TouchPadHandler {
                 sy = 0.0f;
             }
         }
-        
+
         private int currentDirection = 0;
         private int newDirection = 0;
         private float newDirectionDistance = 0.0f;
@@ -143,7 +143,7 @@ public class TouchPadHandler {
                 //System.out.println("scroll: abandon "+touch.dx+","+touch.dy);
                 return;
             }
-            
+
             int direction = 0; // UNKNOWN
             if (Math.abs(touch.dx) > Math.abs(touch.dy*3)) {
                 if (touch.dx > 0) {
@@ -158,7 +158,7 @@ public class TouchPadHandler {
                     direction = 4; // UP
                 }
             }
-            
+
             if ((currentDirection != 0) && (direction != currentDirection)) {
                 if (direction == newDirection) {
                     newDirectionDistance += d;
@@ -176,7 +176,7 @@ public class TouchPadHandler {
                     currentDirection = direction;
                 }
             }
-            
+
             switch (direction) {
             case 0:
                 break;
@@ -193,10 +193,10 @@ public class TouchPadHandler {
                 sy = +d;
                 break;
             }
-            
+
             currentDirection = direction;
         }
-        
+
         public boolean isMoved() {
             if ((dx != 0.0f) || (dy != 0.0f)) {
                 return true;
@@ -204,7 +204,7 @@ public class TouchPadHandler {
                 return false;
             }
         }
-        
+
         public boolean isScrolled() {
             if ((sx != 0.0f) || (sy != 0.0f)) {
                 return true;
@@ -212,13 +212,13 @@ public class TouchPadHandler {
                 return false;
             }
         }
-        
+
         public void drag() {
             this.drag = true;
         }
     };
     private Touch touch = new Touch();
-    
+
     /**
      * A NormalMotionEvent is like a MotionEvent, except that historical
      * event batches have been flattened out into individual units.
@@ -228,16 +228,16 @@ public class TouchPadHandler {
         long t;
         float x, y;
         int pc;
-        
+
         static float lastX=0.0f, lastY=0.0f;
-        
+
         private void init(MotionEvent me) {
             this.action = me.getAction();
             this.t = me.getEventTime();
             this.x = me.getX();
             this.y = me.getY();
             this.pc = me.getPointerCount();
-            
+
             if (pc>1) {
                 float smallestDistance = 999999.0f;
                 int nearestPointer = -1;
@@ -269,7 +269,7 @@ public class TouchPadHandler {
             this.x = me.getHistoricalX(pos);
             this.y = me.getHistoricalY(pos);
             this.pc = me.getPointerCount();
-            
+
             if (pc>1) {
                 float lastDistance = 999999.0f;
                 int nearestPointer = -1;
@@ -294,7 +294,7 @@ public class TouchPadHandler {
             lastX = x;
             lastY = y;
         }
-        
+
         private static final int NUM_POOL_OBJECTS = 20;
         private static NormalMotionEvent pool[] = new NormalMotionEvent[NUM_POOL_OBJECTS];
         private static NormalMotionEvent array1[] = new NormalMotionEvent[1];
@@ -306,7 +306,7 @@ public class TouchPadHandler {
                 pool[i] = new NormalMotionEvent();
             }
         };
-        
+
         public static NormalMotionEvent[] debatchMotionEvent(MotionEvent me) {
             int hs = me.getHistorySize();
             int j=0;
@@ -326,7 +326,7 @@ public class TouchPadHandler {
                 }
             }
             pool[j++].init(me);
-            
+
             // premature optimization?
             switch (j) {
             case 1:
@@ -355,7 +355,7 @@ public class TouchPadHandler {
         }
 
     };
-    
+
     /**
      * A PendingTap holds information about a tap that is scheduled
      * to be delivered in the future, unless a subsequent event
@@ -365,11 +365,11 @@ public class TouchPadHandler {
         public boolean sent = false;
         private boolean canceled = false;
         private boolean multiTouchTap = false;
-        
+
         public PendingTap(boolean multiTouchTap) {
             this.multiTouchTap = multiTouchTap;
         }
-        
+
         public void cancel() {
             canceled = true;
         }
@@ -400,18 +400,18 @@ public class TouchPadHandler {
 
     ////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////
-    
+
     public TouchPadHandler(View view, float xdpi, float ydpi) {
         this.view = view;
         this.xdpi = xdpi;
         this.ydpi = ydpi;
     }
-    
+
     private OnTouchPadEventListener onTouchPadEventListener = null;
     public void setOnTouchPadEventListener(OnTouchPadEventListener onTouchPadEventListener) {
         this.onTouchPadEventListener = onTouchPadEventListener;
     }
-    
+
     private static final boolean debug = false;
     private static final String actions[] = {
         "ACTION_DOWN",              // 0
@@ -443,7 +443,7 @@ public class TouchPadHandler {
                     action = "ACTION_UNKNOWN";
                 }
             }
-            
+
             System.out.printf(
                 "%-22s t=%d x=%f y=%f pc=%d hs=%d down=%d\n",
                 action,
@@ -454,7 +454,7 @@ public class TouchPadHandler {
                 me.getHistorySize(),
                 me.getDownTime()
             );
-            
+
             for (int i=0; i<me.getHistorySize(); i++) {
                 System.out.printf(
                     "%22s t=%d x=%f y=%f pc=%d\n",
@@ -467,7 +467,7 @@ public class TouchPadHandler {
             }
         }
     };
-    
+
     public void send(TouchPadEvent tpe) {
         if (onTouchPadEventListener != null) {
             onTouchPadEventListener.onTouchPadEvent(tpe);
@@ -486,7 +486,7 @@ public class TouchPadHandler {
     private final int STATE_DOWN = 1;
     private final int STATE_MULTI_DOWN = 2;
     private int state = STATE_INITIAL;
-    
+
     public boolean onTouchEvent(MotionEvent me) {
         if (debug) {
             debugEvent(me);
@@ -504,15 +504,15 @@ public class TouchPadHandler {
                 break;
             }
         }
-        
+
         return true;
     }
-    
+
     private void clearState() {
         touch.clear();
         state = STATE_INITIAL;
     }
-    
+
     private void initial(NormalMotionEvent nme) {
         switch (nme.action) {
         case MotionEvent.ACTION_DOWN:
@@ -523,7 +523,7 @@ public class TouchPadHandler {
     }
 
     private void down(NormalMotionEvent nme) {
-        
+
         // fix for the "samsung two-finger tap" bug
         if ( ((nme.action & MotionEvent.ACTION_POINTER_ID_MASK) > 0) &&
              //((nme.action & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) &&
@@ -531,7 +531,7 @@ public class TouchPadHandler {
         ) {
             touch.multiTouch = true;
         }
-        
+
         // handle the multi-pointer down cases
         /*
         if ( ((nme.action & MotionEvent.ACTION_POINTER_ID_MASK) > 0) &&
@@ -546,7 +546,7 @@ public class TouchPadHandler {
             // transition to STATE_MULTI_DOWN
             if (touch.drag) {
                 // cancel the drag by releasing the mouse button
-                send(TouchPadEvent.clear());                
+                send(TouchPadEvent.clear());
             }
             state = STATE_MULTI_DOWN;
             // forward immediately to new state handler
@@ -555,15 +555,15 @@ public class TouchPadHandler {
             * /
         }
         */
-        
-        // handle the other cases 
+
+        // handle the other cases
         switch (nme.action) {
         case MotionEvent.ACTION_DOWN:
             // throw away the existing DOWN state,
             // and start fresh.
             if (touch.drag) {
                 // cancel the drag by releasing the mouse button
-                send(TouchPadEvent.clear());                
+                send(TouchPadEvent.clear());
             }
             clearState();
             state = STATE_DOWN;
@@ -584,7 +584,7 @@ public class TouchPadHandler {
                         }
                         cancelTap();
                     }
-                    
+
                     // send this tap
                     send(TouchPadEvent.tap(touch.multiTouch));
                 } else {
@@ -606,7 +606,7 @@ public class TouchPadHandler {
                 // transition to STATE_MULTI_DOWN
                 if (touch.drag) {
                     // cancel the drag by releasing the mouse button
-                    send(TouchPadEvent.clear());                
+                    send(TouchPadEvent.clear());
                 }
                 state = STATE_MULTI_DOWN;
                 // forward immediately to new state handler
@@ -636,7 +636,7 @@ public class TouchPadHandler {
         case MotionEvent.ACTION_CANCEL:
             if (touch.drag) {
                 // cancel the drag by releasing the mouse button
-                send(TouchPadEvent.clear());                
+                send(TouchPadEvent.clear());
             }
             clearState();
             break;

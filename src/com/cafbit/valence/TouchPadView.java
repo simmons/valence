@@ -42,7 +42,7 @@ public class TouchPadView extends View {
 
     public TouchPadView(Context context) {
         super(context);
-        
+
         float xdpi, ydpi;
         this.setBackgroundColor(Color.BLACK);
 
@@ -53,16 +53,16 @@ public class TouchPadView extends View {
         } else {
             throw new RuntimeException("need activity reference for metrics");
         }
-        
+
         touchPadHandler = new TouchPadHandler(this, xdpi, ydpi);
-        
+
         drawSetup();
     }
-    
+
     public void setOnTouchPadEvent(OnTouchPadEventListener onTouchPadEvent) {
         touchPadHandler.setOnTouchPadEventListener(onTouchPadEvent);
     }
-    
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return touchPadHandler.onTouchEvent(event);
@@ -76,7 +76,7 @@ public class TouchPadView extends View {
     //private Path cornerPath;
     final int s = 4; // spacing
     final int l = 20; // length
-    
+
     private void drawSetup() {
         linePaint.setColor(Color.WHITE);
         linePaint.setStrokeWidth(2.0f);
@@ -107,12 +107,12 @@ public class TouchPadView extends View {
         cornerPath.lineTo(l+s, l+s);
         */
     }
-    
+
     private static class TextBox {
         public int w = 0;
         public int h = 0;
     }
-    
+
     private TextBox getTextBox(Paint paint, String[] lines) {
         Rect bounds = new Rect();
         TextBox box = new TextBox();
@@ -127,7 +127,7 @@ public class TouchPadView extends View {
         }
         return box;
     }
-    
+
     private void renderText(Canvas canvas, float yposPercent, String[] lines) {
         Rect bounds = new Rect();
         int viewWidth = getWidth();
@@ -176,9 +176,9 @@ public class TouchPadView extends View {
             canvas.drawText(line, (viewWidth-tw)/2, ypos, fontPaint);
             ypos += fontPaint.getFontSpacing();
         }
-        
+
     }
-    
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right,
             int bottom) {
@@ -192,7 +192,7 @@ public class TouchPadView extends View {
     public void onDraw(Canvas canvas) {
         int w = this.getWidth();
         int h = this.getHeight();
-        
+
         float boxPoints[] = new float[] {
             0, 0, w, 0,
             w, 0, w, h,
@@ -223,19 +223,19 @@ public class TouchPadView extends View {
             "Two-finger tap to right click.",
             "Two-finger swipe to scroll."
         });
-        
+
         return;
     }
-    
+
     /////////////////////////////////////////////////////////////////
     // Input management
     /////////////////////////////////////////////////////////////////
-    
+
     @Override
     public boolean onCheckIsTextEditor() {
         return true;
     }
-    
+
     /**
      * The HTC soft keyboard requires us to manage the keyboard input,
      * and backspace over discarded characters if the user performed

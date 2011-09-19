@@ -23,7 +23,7 @@ public class ValenceIOException extends IOException {
     private static final long serialVersionUID = -3123355580007791630L;
     private static final String DEFAULT_MESSAGE =
         "A network error occurred.";
-    
+
     public ValenceIOException() {
         super(DEFAULT_MESSAGE);
     }
@@ -32,7 +32,7 @@ public class ValenceIOException extends IOException {
         super(cause.getMessage());
         initCause(cause);
     }
-    
+
     public ValenceIOException(String message) {
         super(message);
     }

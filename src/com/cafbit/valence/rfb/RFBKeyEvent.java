@@ -20,7 +20,7 @@ package com.cafbit.valence.rfb;
 import android.view.KeyEvent;
 
 public class RFBKeyEvent implements RFBEvent {
-    
+
     public static class SpecialKey {
         public String name;
         public String shortName;
@@ -36,14 +36,14 @@ public class RFBKeyEvent implements RFBEvent {
             this.keysym = keysym;
         }
     };
-    
+
     public static final SpecialKey MODIFIERS[] = {
         new SpecialKey("Shift", "shift", 0xFFE1),
         new SpecialKey("Ctrl", "ctrl", 0xFFE3),
         new SpecialKey("Alt", "alt", 0xFFE9),
         new SpecialKey("Win/Cmd", "win", 0xFFEB)
     };
-    
+
     public static final SpecialKey SPECIALS[] = {
         new SpecialKey("Esc", 0xFF1B),
         new SpecialKey("Tab", 0xFF09),
@@ -58,13 +58,13 @@ public class RFBKeyEvent implements RFBEvent {
         new SpecialKey("F9",  0xFFC6),
         new SpecialKey("F10", 0xFFC7)
     };
-    
+
 
     // the android key event will be stored in one of the following three formats:
     KeyEvent keyEvent;
     char ch = 0;
     SpecialKey special = null;
-    
+
     SpecialKey modifier = null;
 
     public RFBKeyEvent(KeyEvent keyEvent) {

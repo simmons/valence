@@ -23,10 +23,10 @@ import java.util.Map;
 import android.view.KeyEvent;
 
 public class KeyTranslator {
-    
+
     // this table was auto-generated from the keysyms.pl perl script.
     public static final int[][] UNICODE_TABLE = {
-        {0x0009, 0xFF09},    // XK_Tab 
+        {0x0009, 0xFF09},    // XK_Tab
         {0x0020, 0x0020},    // XK_space
         {0x0021, 0x0021},    // XK_exclam
         {0x0022, 0x0022},    // XK_quotedbl
@@ -1489,7 +1489,7 @@ public class KeyTranslator {
         {0x28FF, 0x10028FF}, // XK_braille_dots_12345678
     };
 
-    
+
     // convert Android keycodes into X11 keysyms
     public static final int[][] KEYCODE_TABLE = {
         {KeyEvent.KEYCODE_UNKNOWN,          0},
@@ -1542,7 +1542,7 @@ public class KeyTranslator {
         {KeyEvent.KEYCODE_NOTIFICATION,     0},
         {KeyEvent.KEYCODE_SEARCH,           0xFF1B}, // XK_Escape
     };
-    
+
     // a custom pre-built hashtable structure would be better...
     static Map<Short,Integer> unicodeMap = new HashMap<Short,Integer>();
     static Map<Integer,Integer> keycodeMap = new HashMap<Integer,Integer>();
@@ -1564,7 +1564,7 @@ public class KeyTranslator {
             return 0;
         }
     }
-    
+
     public static int translate(KeyEvent keyEvent) {
         int unicode = keyEvent.getUnicodeChar();
         Short s = new Short((short)unicode);

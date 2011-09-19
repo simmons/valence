@@ -41,7 +41,7 @@ import com.cafbit.xmlfoo.annotations.SingletonCode;
 
 @SingletonCode("valence")
 public class ValenceDeviceClass implements DeviceClass {
-    
+
     // package-private constants
     static final String DEVICE_CODE = "valence";
     static final String DEVICE_NAME = "VNC Server";
@@ -64,17 +64,17 @@ public class ValenceDeviceClass implements DeviceClass {
     public String getDeviceDescription() {
         return DEVICE_DESCRIPTION;
     }
-    
+
     @Override
     public Class<? extends Device> getDeviceType() {
         return ValenceDevice.class;
     }
-    
+
     @Override
     public View createDeviceSetupView(Context context, Device device, boolean isUpdate, OnDeviceChange onDeviceChange, DeviceSetupState deviceSetupState) {
         return new ValenceDeviceSetupView(context, (ValenceDevice) device, isUpdate, onDeviceChange, this, (ValenceDeviceSetupState) deviceSetupState);
     }
-    
+
     static class ProbeResult {
         int probeType;
         ValenceDevice device;
@@ -82,9 +82,9 @@ public class ValenceDeviceClass implements DeviceClass {
         Version serverVersion;
         byte[] securityTypes;
     }
-    
+
     public ProbeResult probe(final ValenceDevice device, int probeType) throws IOException {
-        
+
         // create the appropriate RFBSecurity object for this connection
         RFBSecurity security;
         if (device.macAuthentication) {
@@ -95,7 +95,7 @@ public class ValenceDeviceClass implements DeviceClass {
 // TODO: remove this...
 // short-circuit mac auth
 //security = new RFBSecurityVNC(device.password);
-        
+
         RFBConnection conn;
         ProbeResult probeResult = new ProbeResult();
         if (device.address.equals(RFBConnection.MAGIC_DEMO_HOSTNAME)) {
@@ -113,19 +113,19 @@ public class ValenceDeviceClass implements DeviceClass {
         } catch (RFBException e) {
             throw new IOException(e.getMessage());
         }
-        
+
         probeResult.probeType = probeType;
         probeResult.device = device;
         probeResult.serverName = conn.getServerName();
         probeResult.serverVersion = conn.getServerVersion();
         probeResult.securityTypes = conn.getSecurityTypes();
-        
+
         device.deviceClass = this;
         if ((device.serverName == null) || (device.serverName.length()==0)) {
             device.serverName = conn.getServerName();
         }
         device.serverVersion = conn.getServerVersion().toString();
-        
+
         return probeResult;
     }
 
@@ -133,10 +133,10 @@ public class ValenceDeviceClass implements DeviceClass {
     public ReceiverThread getCustomDiscoveryReceiverThread(NetworkManagerThread networkManager) throws IOException {
         return null;
     }
-    
+
     @Override
     public MDNSDiscoveryHandler getMDNSDiscoveryHandler(DiscoveryManagerThread networkManager) throws IOException {
         return new ValenceMDNSDiscoveryHandler(networkManager, this);
     }
-    
+
 }

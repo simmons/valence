@@ -59,9 +59,9 @@ import android.widget.ImageView.ScaleType;
 
 public class ValenceActivity extends Activity implements OnTouchPadEventListener {
     private static final String TAG = "Valence";
-    
+
     private ValenceHandler handler = new ValenceHandlerImpl();
-    
+
     // TODO: consider marshaling the ValenceDevice object into the
     // activity using Parcels or some such, instead of (or in addition
     // to) using the URL approach.
@@ -71,27 +71,27 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     private boolean ard35Compatibility = false;
     private boolean macAuthentication = false;
     private String username;
-    
+
     private RFBThread rfbThread;
     private boolean isRunning = false;
     private InputMethodManager inputMethodManager;
     private TouchPadView touchPadView = null;
-    
+
     private ToggleButton modButton = null;
     private ToggleButton keyButton = null;
     private SpecialKey modifier = null;
-    
+
     //////////////////////////////////////////////////////////////////////
     // Activity lifecycle
     //////////////////////////////////////////////////////////////////////
-    
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         inputMethodManager = ((InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE));
-        
+
         Intent intent = getIntent();
         Uri uri = intent.getData();
         if (uri == null) {
@@ -113,10 +113,10 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
 
-        //TouchPadView 
+        //TouchPadView
         touchPadView = new TouchPadView(this);
         touchPadView.setOnTouchPadEvent(this);
-        
+
         modButton = newModifierButton("mod");
         modButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -130,7 +130,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             }
         });
         registerForContextMenu(modButton);
-        
+
         keyButton = new ToggleButton(this);
         keyButton.setText("keys");
         keyButton.setTextOn("keys");
@@ -145,7 +145,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             }
         });
         registerForContextMenu(keyButton);
-        
+
         ImageButton keyboardButton = new ImageButton(this);
         Drawable keyboardDrawable = getResources().getDrawable(R.drawable.keyboard);
         keyboardButton.setImageDrawable(keyboardDrawable);
@@ -168,16 +168,16 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         rightLayout.addView(keyboardButton);
         rightLayout.setGravity(Gravity.RIGHT);
         buttonLayout.addView(rightLayout, LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
-        
+
         layout.addView(touchPadView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1));
         layout.addView(buttonLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0));
 
         setContentView(layout);
-        
+
         touchPadView.setFocusable(true);
         touchPadView.setFocusableInTouchMode(true);
         touchPadView.requestFocus();
-        
+
         RFBThread savedRfbThread = (RFBThread) getLastNonConfigurationInstance();
         if (savedRfbThread != null) {
             reattachThread(savedRfbThread);
@@ -189,7 +189,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     /**
      * This is called when the user resumes using the activity
      * after using other programs (and at activity creation time).
-     * 
+     *
      * We don't keep the network thread running when the user is
      * not running this program in the foreground, so we use this
      * method to initialize the packet list and start the
@@ -200,7 +200,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         super.onResume();
 
         isRunning = true;
-        
+
         if (! rfbThread.isAlive()) {
             Log.w(TAG, "rfbThread is disconnected -- reconnect.");
             rfbThread = null;
@@ -223,7 +223,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     protected void onPause() {
         isRunning = false;
         super.onPause();
-        
+
         if (rfbThread != null) {
             RFBThreadHandler rfbHandler = rfbThread.getHandler();
             if (rfbHandler != null) {
@@ -232,7 +232,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         }
 
     }
-    
+
     @Override
     public Object onRetainNonConfigurationInstance() {
         detachThread();
@@ -240,18 +240,18 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         this.rfbThread = null;
         return persistentRfbThread;
     }
-    
+
     @Override
     protected void onDestroy() {
         stopThread();
         super.onDestroy();
     }
-    
+
     @Override
     public void onStop() {
         super.onStop();
     }
-    
+
     @Override
     public void onStart() {
         super.onStart();
@@ -261,7 +261,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     public void onRestart() {
         super.onRestart();
     }
-    
+
     @Override
     public void onBackPressed() {
         finish();
@@ -275,21 +275,21 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     public boolean onCreateOptionsMenu(Menu menu) {
         return OptionsMenuHelper.onCreateOptionsMenu(this, menu);
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean result = OptionsMenuHelper.onOptionsItemSelected(this, item);
         if (result) {
             return true;
         } else {
-            return super.onOptionsItemSelected(item);           
+            return super.onOptionsItemSelected(item);
         }
     }
-    
+
     //////////////////////////////////////////////////////////////////////
     // context menus
     //////////////////////////////////////////////////////////////////////
-    
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -305,16 +305,16 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
                 SpecialKey key = RFBKeyEvent.SPECIALS[i];
                 menu.add(Menu.NONE, (2<<16) | i, Menu.NONE, key.name);
             }
-            
+
         }
     }
-    
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         int major = itemId >> 16;
         int minor = itemId & 0xFFFF;
-        
+
         switch (major) {
         case 1:
             // mod menu
@@ -332,10 +332,10 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             }
             break;
         }
-        
+
         return true;
     }
-    
+
     private ToggleButton newModifierButton(String text) {
         ToggleButton button = new ToggleButton(this);
         button.setText(text);
@@ -345,12 +345,12 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         button.setFocusableInTouchMode(false);
         return button;
     }
-    
+
     private void startThread() {
         if (rfbThread != null) {
             Log.e(TAG, "rfbThread should be null!");
         }
-        
+
         // create the appropriate RFBSecurity object for this connection
         RFBSecurity security;
         if (macAuthentication) {
@@ -358,7 +358,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         } else {
             security = new RFBSecurityVNC(password);
         }
-        
+
         if (port != -1) {
             rfbThread = new RFBThread(handler, address, port, security);
         } else {
@@ -370,7 +370,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         rfbThread.start();
         startConnectDialog();
     }
-    
+
     private void stopThread() {
         if (rfbThread != null) {
             RFBThread.RFBThreadHandler handler = rfbThread.getHandler();
@@ -380,7 +380,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             rfbThread = null;
         }
     }
-    
+
     private void detachThread() {
         if (rfbThread != null) {
             RFBThread.RFBThreadHandler handler = rfbThread.getHandler();
@@ -393,7 +393,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             }
         }
     }
-    
+
     private void reattachThread(RFBThread rfbThread) {
         rfbThread.setValenceHandler(handler);
         rfbThread.getHandler().onReattach();
@@ -413,13 +413,13 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             }
         });
     }
-    
+
     private void stopConnectDialog() {
         if (connectDialog != null) {
             connectDialog.dismiss();
         }
     }
-    
+
     private final boolean isConnected() {
         if ((rfbThread != null) && (rfbThread.isConnected())) {
             return true;
@@ -436,7 +436,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         sendKey(new RFBKeyEvent(keyEvent, modifier));
         return true;
     }
-    
+
     @Override
     public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent keyEvent) {
         // handle the special case of a ACTION_MULTIPLE event with key code of KEYCODE_UNKNOWN,
@@ -453,7 +453,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             return super.onKeyMultiple(keyCode, repeatCount, keyEvent);
         }
     }
-    
+
     /*
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent keyEvent) {
@@ -477,7 +477,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     }
     */
 
-    
+
     private void sendKey(RFBKeyEvent rfbKeyEvent) {
         if (isConnected()) {
             rfbThread.getHandler().onRFBEvent(rfbKeyEvent);
@@ -487,7 +487,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             }
         }
     }
-    
+
     //
     // implement OnTouchPadEventListener
     //
@@ -507,7 +507,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             rpe.button2 = tpe.button2;
             rpe.sy = tpe.sy;
             rpe.sx = tpe.sx;
-            
+
             // send the RFBPointerEvent
 //tpe.debug();
             rfbThread.getHandler().onRFBEvent(rpe);
@@ -535,14 +535,14 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         });
         return;
     }
-    
+
     public interface ValenceHandler {
         public void error(Throwable throwable);
         public void onConnect();
         public void onDisconnect();
         public void onAbnormalDisconnect();
     };
-    
+
     public static class ValenceDetachedHandler implements ValenceHandler {
         @Override
         public void error(Throwable throwable) {}
@@ -553,22 +553,22 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         @Override
         public void onDisconnect() {}
     };
-    
+
     public class ValenceHandlerImpl extends Handler implements ValenceHandler {
-        
+
         public static final int MSG_ERROR = 1;
         public static final int MSG_CONNECT = 2;
         public static final int MSG_DISCONNECT = 3;
         public static final int MSG_ABNORMAL_DISCONNECT = 4;
-        
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            
+
             if (! isRunning) {
                 return;
             }
-            
+
             switch (msg.what) {
             case MSG_ERROR:
                 finishOnAlert = true;
@@ -596,13 +596,13 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
                 break;
             }
         }
-        
+
         // helper methods
-        
+
         public void error(Throwable throwable) {
             sendMessage(Message.obtain(this, MSG_ERROR, throwable));
         }
-        
+
         public void onConnect() {
             sendMessage(Message.obtain(this, MSG_CONNECT));
         }
@@ -616,5 +616,5 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         }
     }
 
-    
+
 }

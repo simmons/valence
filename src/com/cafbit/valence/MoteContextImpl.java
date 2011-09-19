@@ -36,7 +36,7 @@ public class MoteContextImpl extends MoteContext {
     public MoteContextImpl(Context context) {
         super(context);
     }
-    
+
     @Override
     public String getDeviceWord(DeviceClass deviceClass, boolean plural, boolean capitalized) {
         if (plural) {

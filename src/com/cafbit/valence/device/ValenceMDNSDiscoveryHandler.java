@@ -37,9 +37,9 @@ import com.cafbit.netlib.dns.DNSAnswer;
 import com.cafbit.netlib.dns.DNSMessage;
 
 public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
-    
+
     private static final String INITIAL_QUERY_NAME = "_rfb._tcp.local";
-    
+
     private DiscoveryManagerThread discoveryManagerThread;
     private Map<String,Set<InetAddress>> addressCache =
         new HashMap<String,Set<InetAddress>>();
@@ -50,7 +50,7 @@ public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
     private QueryTimer queryTimer;
     private DeviceClass deviceClass;
     private boolean allowIPv6;
-    
+
     private static class Candidate {
         public String name;
         public boolean srvQueried = false;
@@ -81,7 +81,7 @@ public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
             if (answer.data instanceof DNSAnswer.PTR) {
                 DNSAnswer.PTR ptr = (DNSAnswer.PTR)answer.data;
                 ptrCache.put(answer.name, ptr.name);
-                
+
                 if (answer.name.equals(INITIAL_QUERY_NAME)) {
                     // we have a PTR record for our discovery query...
                     // add a candidate
@@ -106,7 +106,7 @@ public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
                 addressCacheSet.add(a.address);
             }
         }
-        
+
         for (Candidate c : candidateMap.values()) {
             if (! c.srvQueried) {
                 if (! srvCache.containsKey(c.name)) {
@@ -129,7 +129,7 @@ public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
                         } else {
                             c.addresses.add(address);
                         }
-                        
+
                         // construct a Device object based on the responses
                         ValenceDevice device = new ValenceDevice(deviceClass);
                         device.address = address.getHostAddress();
@@ -139,17 +139,17 @@ public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
                         if (device.serverName.endsWith(".local")) {
                             device.serverName = device.serverName.substring(0, device.serverName.length()-6);
                         }
-                        
+
                         // send the Device object upstream
                         discoveryManagerThread.getHandler().sendCommand(new DiscoveryActivity.DeviceCommand(device));
                     }
                 }
             }
         }
-        
-        
+
+
     }
-    
+
     @Override
     public void stop() {
         queryTimer.cancel();
@@ -163,11 +163,11 @@ public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
             queryTimer.query(name);
         }
     }
-    
+
     //////////
-    
+
     private class QueryTimer extends Timer {
-        
+
         private class QueryTask extends TimerTask {
             public String name;
             public long nextDelay;
@@ -185,17 +185,17 @@ public class ValenceMDNSDiscoveryHandler implements MDNSDiscoveryHandler {
                 // re-queue with exponential backoff
                 long thisDelay = nextDelay;
                 nextDelay *= 2;
-                
+
                 QueryTask task = new QueryTask(name, nextDelay);
                 QueryTimer.this.schedule(task, thisDelay);
             }
         }
-        
+
         private Map<String,QueryTask> runningTasks =
             Collections.synchronizedMap(
                 new HashMap<String,QueryTask>()
             );
-        
+
         private Random random = new Random(System.currentTimeMillis());
         public QueryTimer() {
             super("valence-mdns-query", true);

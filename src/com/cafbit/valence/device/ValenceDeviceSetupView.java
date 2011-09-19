@@ -51,14 +51,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class ValenceDeviceSetupView extends FrameLayout implements OnClickListener,OnSaveDeviceSetupState {
-    
+
     private static final int MSG_PROBE_FAILURE = 0;
     private static final int MSG_PROBE_SUCCESS = 1;
-    
+
     private Context context;
     private OnDeviceChange onDeviceChange;
     private ValenceDeviceClass deviceClass;
-    
+
     private EditText addressEdit;
     private EditText portEdit;
     private EditText passwordEdit;
@@ -66,7 +66,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
     private CheckBox macAuthCheckbox;
     private EditText usernameEdit;
     private CheckBox ard35CompatibilityCheckbox;
-    
+
     public static class ValenceDeviceSetupState extends DeviceSetupState {
         public ValenceDevice device = null;
         public int state = 1;
@@ -74,7 +74,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         private ValenceDeviceClass.ProbeResult probeResult;
     }
     private ValenceDeviceSetupState state = new ValenceDeviceSetupState();
-    
+
     public ValenceDeviceSetupView(Context context, ValenceDevice device, boolean isUpdate, OnDeviceChange onDeviceChange, ValenceDeviceClass deviceClass, ValenceDeviceSetupState state) {
         super(context);
 
@@ -87,11 +87,11 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         if (this.state.device == null) {
             this.state.device = new ValenceDevice(deviceClass);
         }
-        
+
         this.context = context;
         this.deviceClass = deviceClass;
         this.onDeviceChange = onDeviceChange;
-        
+
         setPadding(10,10,10,10);
         transition(this.state.state);
     }
@@ -100,16 +100,16 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         removeAllViews();
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
-        
+
         TextView stepLabel = new TextView(context);
         stepLabel.setText("Step 1: Server address");
         stepLabel.setTypeface(null, Typeface.BOLD);
         layout.addView(stepLabel);
-        
+
         TextView addressLabel = new TextView(context);
         addressLabel.setText("Enter the IP address or hostname of the VNC server:");
         layout.addView(addressLabel);
-        
+
         addressEdit = new EditText(context);
         addressEdit.setSingleLine();
         addressEdit.setHint("0.0.0.0");
@@ -134,7 +134,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         button.setText("Next...");
         button.setOnClickListener(this);
         layout.addView(button);
-        
+
         ScrollView scrollView = new ScrollView(context);
         scrollView.addView(layout);
         addView(scrollView);
@@ -144,7 +144,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         removeAllViews();
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
-        
+
         TextView stepLabel = new TextView(context);
         stepLabel.setText("Step 2: Server settings");
         stepLabel.setTypeface(null, Typeface.BOLD);
@@ -176,7 +176,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         TextView deviceLabel = new TextView(context);
         deviceLabel.setText(sb.toString());
         layout.addView(deviceLabel);
-        
+
         TextView passwordLabel = new TextView(context);
         passwordLabel.setText("Enter your password:");
         layout.addView(passwordLabel);
@@ -187,7 +187,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         passwordEdit.setTransformationMethod(new PasswordTransformationMethod());
         passwordEdit.setText(state.device.password);
         layout.addView(passwordEdit);
-        
+
         TextView nameLabel = new TextView(context);
         nameLabel.setText("Name used in the selection menu (optional):");
         layout.addView(nameLabel);
@@ -197,12 +197,12 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         nameEdit.setHint("Default: auto-detect server name");
         nameEdit.setText(state.device.serverName);
         layout.addView(nameEdit);
-        
+
         if (state.probeResult.serverVersion.isAppleRemoteDesktop()) {
-            
+
             // horizontal rule
             layout.addView(createHorizontalRule());
-            
+
             TextView ardLabel = new TextView(context);
             ardLabel.setText("Apple Remote Desktop options");
             ardLabel.setTypeface(null, Typeface.BOLD);
@@ -210,8 +210,10 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
 
             if (supportsMacAuth) {
                 TextView macAuthLabel = new TextView(context);
-                macAuthLabel.setText("Mac OS X authentication is required if you are " +
-                		"connecting to a machine running Mac OS X 10.7 Lion.");
+                macAuthLabel.setText(
+                    "Mac OS X authentication is required if you are " +
+                    "connecting to a machine running Mac OS X 10.7 Lion."
+                );
                 layout.addView(macAuthLabel);
 
                 macAuthCheckbox = new CheckBox(context);
@@ -226,19 +228,19 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
                 );
                 macAuthCheckbox.setChecked(state.device.macAuthentication);
                 layout.addView(macAuthCheckbox);
-                
+
                 final TextView usernameLabel = new TextView(context);
                 usernameLabel.setText("Username for Mac authentication:");
                 usernameLabel.setEnabled(macAuthCheckbox.isChecked());
                 layout.addView(usernameLabel);
-                
+
                 usernameEdit = new EditText(context);
                 usernameEdit.setSingleLine();
                 usernameEdit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                 usernameEdit.setText(state.device.username);
                 usernameEdit.setEnabled(macAuthCheckbox.isChecked());
                 layout.addView(usernameEdit);
-                
+
                 // gray out the username stuff if mac auth isn't checked
                 macAuthCheckbox.setOnCheckedChangeListener(
                     new CompoundButton.OnCheckedChangeListener() {
@@ -252,13 +254,13 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
                                 usernameEdit.setEnabled(true);
                             } else {
                                 usernameLabel.setEnabled(false);
-                                usernameEdit.setEnabled(false);                                
+                                usernameEdit.setEnabled(false);
                             }
                         }
                     }
                 );
             }
-            
+
             // ARD v3.5 compatibility: send button-2 instead of button-3
             // on two-finger tap.
             TextView ard35CompatibilityLabel = new TextView(context);
@@ -282,7 +284,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
             );
             ard35CompatibilityCheckbox.setChecked(state.device.ard35Compatibility);
             layout.addView(ard35CompatibilityCheckbox);
-            
+
             layout.addView(createHorizontalRule());
         } else {
             ard35CompatibilityCheckbox = null;
@@ -294,7 +296,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         button.setText("Next...");
         button.setOnClickListener(this);
         layout.addView(button);
-        
+
         ScrollView scrollView = new ScrollView(context);
         scrollView.addView(layout);
         addView(scrollView);
@@ -304,7 +306,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         removeAllViews();
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
-        
+
         TextView titleLabel = new TextView(context);
         titleLabel.setText("Step 3: Confirm server settings");
         titleLabel.setTypeface(null, Typeface.BOLD);
@@ -339,7 +341,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
 
         addView(layout);
     }
-    
+
     private void transition(int state) {
         switch (state) {
         case 1:
@@ -370,7 +372,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
             onPhase3Submit();
         }
     }
-    
+
     private void readFields() {
 
         switch (state.state) {
@@ -380,7 +382,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
             if (address.length() == 0) {
                 address = null;
             }
-            
+
             // read port
             int port = 0;
             String portString = portEdit.getText().toString();
@@ -392,27 +394,27 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
             if (port == 0) {
                 port = RFBConnection.DEFAULT_PORT;
             }
-            
+
             state.device.address = address;
             state.device.port = port;
             break;
-            
+
         case 2:
             // read password
             String password = passwordEdit.getText().toString();
             if (password.length() == 0) {
                 password = null;
             }
-            
+
             // read name
             String name = nameEdit.getText().toString();
             if (name.length() == 0) {
                 name = null;
             }
-            
+
             state.device.password = password;
             state.device.serverName = name;
-            
+
             if (ard35CompatibilityCheckbox == null) {
                 state.device.ard35Compatibility = false;
             } else {
@@ -429,18 +431,18 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
                 }
             }
             break;
-        }        
+        }
     }
-    
+
     private void onPhase1Submit() {
-        
+
         readFields();
-        
+
         // validate address format
         // TODO: solution for name resolution timeouts?
         if (state.device.address == null) {
             alert("Error", "A valid IP address or hostname is required to connect to this VNC server.");
-            return;         
+            return;
         }
         final InetAddress deviceAddress;
         if (state.device.address.equals(RFBConnection.MAGIC_DEMO_HOSTNAME)) {
@@ -460,7 +462,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
                 return;
             }
         }
-        
+
         probe();
     }
 
@@ -478,12 +480,12 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
                 return;
             }
         }
-            
+
         probe();
     }
 
     private void probe() {
-        
+
         // probe the device
         // TODO: come up with some workable solution for connect timeouts.
         //       Maybe a timeout in the parent thread which leads to a forced Socket.close().
@@ -514,7 +516,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         }, "valence-probe");
         probeThread.start();
         // success = success screen with information
-        
+
         // failure = messagebox + return to setupview
     }
 
@@ -557,13 +559,13 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
                 }
                 alert("Connection Error", text);
             }
-        }       
+        }
     }
-    
+
     private void onSuccessfulSecurityProbe(ValenceDeviceClass.ProbeResult probeResult) {
         this.state.device = probeResult.device;
         this.state.probeResult = probeResult;
-        
+
         // transition to the next state
         transition(2);
     }
@@ -571,7 +573,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
     private void onSuccessfulAuthProbe(ValenceDeviceClass.ProbeResult probeResult) {
         this.state.device = probeResult.device;
         this.state.probeResult = probeResult;
-        
+
         // transition to the next state
         transition(3);
     }
@@ -583,7 +585,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
             onDeviceChange.onAddDevice(state.device);
         }
     }
-    
+
     private void alert(String title, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setPositiveButton("OK", null);
@@ -601,7 +603,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         }
         return state;
     }
-    
+
     private View createHorizontalRule() {
         // horizontal rule
         View horizontalRule = new View(context);
@@ -617,7 +619,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
         } catch (Exception e) {
             color = Color.WHITE;
         }
-        
+
         horizontalRule.setBackgroundColor(color);
         hrParams.setMargins(4, 6, 4, 6);
         return horizontalRule;

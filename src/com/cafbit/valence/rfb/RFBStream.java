@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import android.view.KeyEvent;
 
 public class RFBStream {
-    
+
     private static final int BUFFER_SIZE = 4096;
     private byte[] buffer = new byte[BUFFER_SIZE];
     private InputStream inputStream;
@@ -36,7 +36,7 @@ public class RFBStream {
         NEED_VERSION
     };
     private State state = State.NEED_VERSION;
-    
+
     public RFBStream(InputStream inputStream, OutputStream outputStream) {
         this.inputStream = new BufferedInputStream(inputStream, BUFFER_SIZE);
         this.outputStream = outputStream;
@@ -45,12 +45,12 @@ public class RFBStream {
     public RFBMessage read() throws IOException, RFBException {
         return null;
     }
-    
+
     byte[] read(int length) throws IOException {
 
         byte[] buffer = new byte[length];
         int pos = 0;
-        
+
         while (pos < length) {
             //System.out.println("reading.  pos="+pos+" length="+length);
             int nbytes = inputStream.read(buffer, pos, length-pos);
@@ -59,7 +59,7 @@ public class RFBStream {
             }
         }
         //System.out.println("read:\n"+Util.hexDump(buffer));
-        
+
         return buffer;
     }
 
@@ -80,7 +80,7 @@ public class RFBStream {
         byte[] buffer = read(length);
         return new String(buffer, "ASCII");
     }
-    
+
     void write(byte[] ba) throws IOException {
         //System.out.println("write:\n"+Util.hexDump(ba));
         outputStream.write(ba);
@@ -101,16 +101,16 @@ public class RFBStream {
         Version version = new Version(buffer);
         return version;
     }
-    
+
     public void writeVersion(int version) throws IOException {
         this.version = version;
         Version v = new Version(version);
         write(v);
     }
-    
+
     public byte[] readSecurity() throws IOException {
         byte[] securityTypes;
-        
+
         if (version >= 0x0307) {
             int num = readByte();
             if (num == 0) {
@@ -126,30 +126,30 @@ public class RFBStream {
         }
         return securityTypes;
     }
-    
+
     public void writeSecurity(byte securityType) throws IOException {
         writeByte(securityType);
     }
-    
+
     public int readSecurityResult() throws IOException {
         return readInt();
     }
-    
+
     public Object[] performInitialization() throws IOException {
         // send ClientInit: shared-flag = 1;
         writeByte(0x01);
-        
+
         // read the ServerInit
         byte[] buf = read(20);
         String name = readString();
-        
+
         // parse the ServerInit
         int width = (buf[0]&0xFF)<<8 | (int)(buf[1] & 0xFF);
         int height = (buf[2]&0xFF)<<8 | (int)(buf[3] & 0xFF);
-        
+
         //System.out.println("server-init: \""+name+"\" "+width+"x"+height);
         return new Object[] { name, width, height };
-        
+
         // TODO: remove this testing code
         // TESTING:
         /*
@@ -165,12 +165,12 @@ public class RFBStream {
             0x00, 0x00, // padding
             0x00, 0x00, 0x00, 0x41 // keysym
         };
-    
+
         write(keyDown);
         write(keyUp);
         write(keyDown);
         write(keyUp);
-        
+
         int x = 5;
         int y = 5;
         for (int i=0; i<15; i++) {
@@ -194,7 +194,7 @@ public class RFBStream {
         }
         */
     }
-    
+
     public void sendPointerEvent(byte buttons, int x, int y) throws IOException {
         byte[] pointerEvent = new byte[] {
             0x05, // message-type
@@ -202,7 +202,7 @@ public class RFBStream {
             (byte)((x&0xFF00)>>8), (byte)(x&0xFF),
             (byte)((y&0xFF00)>>8), (byte)(y&0xFF),
         };
-        write(pointerEvent);    
+        write(pointerEvent);
     }
 
     /**
@@ -231,7 +231,7 @@ public class RFBStream {
             buffer[n+10] = y1;
             buffer[n+11] = y2;
         }
-        write(buffer);  
+        write(buffer);
     }
 
     public void sendKey(RFBKeyEvent keyEvent) throws IOException {
@@ -250,19 +250,19 @@ public class RFBStream {
         if (keysym == 0) {
             return;
         }
-        
+
         if (keyEvent.modifier != null) {
             sendKeyDown(keyEvent.modifier.keysym);
         }
-        
+
         sendKeyDown(keysym);
         sendKeyUp(keysym);
-        
+
         if (keyEvent.modifier != null) {
             sendKeyUp(keyEvent.modifier.keysym);
         }
     }
-    
+
     private void sendKeyDown(int keysym) throws IOException {
         byte[] keyDown = new byte[] {
             0x04, // message-type
@@ -275,7 +275,7 @@ public class RFBStream {
         };
         write(keyDown);
     }
-    
+
     private void sendKeyUp(int keysym) throws IOException {
         byte[] keyUp = new byte[] {
             0x04, // message-type
@@ -288,5 +288,5 @@ public class RFBStream {
         };
         write(keyUp);
     }
-    
+
 }

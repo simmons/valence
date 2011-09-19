@@ -31,24 +31,24 @@ import com.cafbit.valence.rfb.RFBEvent;
 import com.cafbit.valence.rfb.RFBSecurity;
 
 public class RFBThread extends Thread {
-    
+
     private static final long DETACH_TIMEOUT = 10*1000; // 10 seconds
     private static final long ACTIVITY_TIMEOUT = 10*60*1000; // 10 minutes
 
     private static int serial = 0;
-    
+
     private ValenceHandler parentHandler;
     private RFBThreadHandler myHandler;
     private RFBConnection conn;
     private RFBRecvThread recvThread;
     private boolean connected = false;
-    
+
     public RFBThread(ValenceHandler handler, String address, int port, RFBSecurity security) {
         this.parentHandler = handler;
         this.conn = new RFBConnection(address, port, security);
         setName("rfb-"+(serial++));
     }
-    
+
     public RFBThread(ValenceHandler handler, String address, RFBSecurity security) {
         this.parentHandler = handler;
         this.conn = new RFBConnection(address, security);
@@ -61,15 +61,15 @@ public class RFBThread extends Thread {
     public boolean getArd35Compatibility() {
         return this.conn.getArd35Compatibility();
     }
-    
+
     public void setValenceHandler(ValenceHandler valenceHandler) {
         this.parentHandler = valenceHandler;
     }
-    
+
     public RFBThreadHandler getHandler() {
         return myHandler;
     }
-    
+
     public boolean isConnected() {
         return connected;
     }
@@ -88,20 +88,20 @@ public class RFBThread extends Thread {
             parentHandler.error(e);
             return;
         }
-        
+
         // set up the receiving thread
         // (we don't use received data.  this just gobbles bytes, on
         // the off chance that the server sends us something.)
         recvThread = new RFBRecvThread(myHandler, conn.getSocket());
         recvThread.start();
-        
+
         // notify the parent that we are connected
         parentHandler.onConnect();
         connected = true;
 
         // loop!
         Looper.loop();
-        
+
         connected = false;
         recvThread.invalidate();
         recvThread = null;
@@ -111,7 +111,7 @@ public class RFBThread extends Thread {
             e.printStackTrace();
         }
     }
-    
+
     public class RFBThreadHandler extends Handler {
 
         public static final int MSG_QUIT = 1;
@@ -119,10 +119,10 @@ public class RFBThread extends Thread {
         public static final int MSG_RECV_DISCONNECT = 3;
         public static final int MSG_RFB_EVENT = 4;
         public static final int MSG_TIMEOUT = 5;
-        
+
         public RFBThreadHandler() {
         }
-        
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -161,13 +161,13 @@ public class RFBThread extends Thread {
                         recvThread.invalidate();
                     }
                     parentHandler.error(e);
-                    Looper.myLooper().quit();                   
+                    Looper.myLooper().quit();
                 }
                 break;
             }
 
         }
-        
+
         // helper methods
 
         public void quit() {
@@ -177,11 +177,11 @@ public class RFBThread extends Thread {
         public void error(Throwable throwable) {
             sendMessage(Message.obtain(this, MSG_ERROR, throwable));
         }
-        
+
         public void onRecvDisconnect() {
             sendMessage(Message.obtain(this, MSG_RECV_DISCONNECT));
         }
-        
+
         public void onRFBEvent(RFBEvent event) {
             sendMessage(Message.obtain(this, MSG_RFB_EVENT, event));
         }
@@ -189,7 +189,7 @@ public class RFBThread extends Thread {
         public void onDetach() {
             sendMessageDelayed(Message.obtain(this, MSG_TIMEOUT), DETACH_TIMEOUT);
         }
-        
+
         public void onReattach() {
             removeMessages(MSG_TIMEOUT);
         }
@@ -197,7 +197,7 @@ public class RFBThread extends Thread {
         public void onActivityPause() {
             sendMessageDelayed(Message.obtain(this, MSG_TIMEOUT), ACTIVITY_TIMEOUT);
         }
-        
+
         public void onActivityResume() {
             removeMessages(MSG_TIMEOUT);
         }

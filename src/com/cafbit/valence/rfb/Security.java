@@ -18,8 +18,8 @@
 package com.cafbit.valence.rfb;
 
 public class Security extends RFBMessage {
-    
-    
+
+
 
     @Override
     public byte[] getBytes() {

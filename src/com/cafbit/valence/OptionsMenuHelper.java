@@ -32,13 +32,13 @@ import android.view.View;
 import android.widget.TextView;
 
 public class OptionsMenuHelper {
-    
+
     public static boolean onCreateOptionsMenu(Activity activity, Menu menu) {
         MenuInflater inflater = activity.getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
         return true;
     }
-    
+
     public static boolean onOptionsItemSelected(Activity activity, MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {

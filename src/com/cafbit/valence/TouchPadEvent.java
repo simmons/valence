@@ -16,7 +16,7 @@
  */
 
 /**
- * 
+ *
  */
 package com.cafbit.valence;
 
@@ -29,12 +29,12 @@ public class TouchPadEvent {
     boolean button2 = false;
     float sx = 0.0f; // scroll x
     float sy = 0.0f; // scroll y
-    
+
     public static TouchPadEvent[] tap(boolean multiTouchTap) {
         TouchPadEvent events[] = new TouchPadEvent[2];
         events[0] = new TouchPadEvent();
         if (multiTouchTap) {
-            events[0].button2 = true;           
+            events[0].button2 = true;
         } else {
             events[0].button1 = true;
         }
@@ -70,7 +70,7 @@ public class TouchPadEvent {
         event.button1 = true;
         return event;
     }
-    
+
     public static TouchPadEvent scroll(Touch touch) {
         TouchPadEvent event = new TouchPadEvent();
         event.sx = touch.sx;

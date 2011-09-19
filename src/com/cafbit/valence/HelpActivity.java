@@ -31,7 +31,7 @@ public class HelpActivity extends Activity {
 
         TextView view = new TextView(this);
         view.setText("Howdy folks.");
-        
+
         WebView webView = new WebView(this);
         //webView.loadUrl("http://davidsimmons.com/");
         webView.loadUrl("file:///android_asset/help.html");

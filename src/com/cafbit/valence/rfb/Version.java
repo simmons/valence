@@ -16,25 +16,25 @@
  */
 
 /**
- * 
+ *
  */
 package com.cafbit.valence.rfb;
 
 public class Version extends RFBMessage {
-    
+
     public int major;
     public int minor;
-    
+
     public Version(int version) {
         this.major = (version >> 8) & 0xFF;
         this.minor = version & 0xFF;
     }
-    
+
     public Version(int major, int minor) {
         this.major = major;
         this.minor = minor;
     }
-    
+
     public Version(byte[] buffer) throws RFBException {
         if (buffer.length != 12) {
             throw new RFBException("version buffer must be 12 bytes");
@@ -49,7 +49,7 @@ public class Version extends RFBMessage {
             throw new RFBException("invalid version from server", e);
         }
     }
-    
+
     @Override
     public byte[] getBytes() {
         byte[] buffer = new byte[12];
@@ -67,11 +67,11 @@ public class Version extends RFBMessage {
         buffer[11] = '\n';
         return buffer;
     }
-    
+
     public int asInt() {
         return major<<8 | minor;
     }
-    
+
     public String toString() {
         return ""+major+'.'+minor;
     }

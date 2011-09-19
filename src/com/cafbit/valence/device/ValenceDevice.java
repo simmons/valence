@@ -34,10 +34,10 @@ public class ValenceDevice extends Device {
     public boolean ard35Compatibility = false;
     public boolean macAuthentication = false;
     public String username;
-    
+
     public ValenceDevice() {
     }
-    
+
     public ValenceDevice(DeviceClass deviceClass) {
         this.deviceClass = deviceClass;
     }
@@ -61,16 +61,16 @@ public class ValenceDevice extends Device {
         }
         return inetAddress;
     }
-    
+
     @Override
     public String getHeadline() {
         return serverName;
     }
-    
+
     @Override
     public String getDescription() {
         StringBuilder sb = new StringBuilder();
-        
+
         String name;
         if (serverName == null) {
             name = "";
@@ -79,21 +79,21 @@ public class ValenceDevice extends Device {
         } else {
             name = serverName + "@";
         }
-        
+
         String version;
         if (serverVersion != null) {
             version = " (v"+serverVersion+")";
         } else {
             version = "";
         }
-        
+
         sb.append(name);
         sb.append(address);
         if (port != 5900) {
             sb.append(":"+port);
         }
         sb.append(version);
-        
+
         return sb.toString();
     }
 
