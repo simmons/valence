@@ -101,4 +101,28 @@ public class ValenceDevice extends Device {
         return "valence://"+address+"/";
     }
 
+    // the superclass hashes address; we hash port
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + port;
+        return result;
+    }
+
+    // the superclass compares address; we compare port
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ValenceDevice other = (ValenceDevice) obj;
+        if (port != other.port)
+            return false;
+        return true;
+    }
+
 }

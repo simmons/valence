@@ -212,7 +212,7 @@ public class ValenceDeviceSetupView extends FrameLayout implements OnClickListen
                 TextView macAuthLabel = new TextView(context);
                 macAuthLabel.setText(
                     "Mac OS X authentication is required if you are " +
-                    "connecting to a machine running Mac OS X 10.7 Lion."
+                    "connecting to a machine running Mac OS X 10.7 Lion.  (Or later updates to 10.6 Snow Leopard!)"
                 );
                 layout.addView(macAuthLabel);
 
