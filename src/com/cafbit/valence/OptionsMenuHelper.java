@@ -17,12 +17,9 @@
 
 package com.cafbit.valence;
 
-import com.cafbit.motelib.settings.AddDeviceActivity;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.text.method.ScrollingMovementMethod;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,15 +38,15 @@ public class OptionsMenuHelper {
 
     public static boolean onOptionsItemSelected(Activity activity, MenuItem item) {
         // Handle item selection
-        switch (item.getItemId()) {
-        case R.id.about:
+        int itemId = item.getItemId();
+        if (itemId == R.id.about) {
             about(activity);
             return true;
-        case R.id.help:
+        } else if (itemId == R.id.help) {
             Intent intent = new Intent(activity, HelpActivity.class);
             activity.startActivity(intent);
             return true;
-        default:
+        } else {
             return false;
         }
     }
