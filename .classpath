@@ -6,5 +6,7 @@
 	<classpathentry kind="src" path="netlib_src"/>
 	<classpathentry kind="src" path="xmlfoo_src"/>
 	<classpathentry kind="src" path="motelib_src"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
