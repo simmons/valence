@@ -19,6 +19,8 @@ package com.cafbit.valence;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -49,17 +51,25 @@ public class SelectionActivity extends DevicesActivity {
     }
     */
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+    }
+
+    @Override
     protected void onDeviceSelected(Device d) {
-        if (! (d instanceof ValenceDevice)) {
+        if (!(d instanceof ValenceDevice)) {
             return;
         }
-        ValenceDevice device = (ValenceDevice)d;
+        ValenceDevice device = (ValenceDevice) d;
 
         Intent intent = new Intent(this, ValenceActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         Uri.Builder builder = new Uri.Builder()
-            .scheme("valence")
-            .encodedAuthority(Uri.encode(device.address)+":"+Uri.encode(""+device.port));
+                .scheme("valence")
+                .encodedAuthority(Uri.encode(device.address) + ":" + Uri.encode("" + device.port));
         if ((device.password != null) && (device.password.length() > 0)) {
             builder.appendQueryParameter("password", device.password);
         }
@@ -78,6 +88,7 @@ public class SelectionActivity extends DevicesActivity {
         startActivity(intent);
     }
 
+    @Override
     protected void onAddNewDevice() {
         Intent intent = new Intent(this, AddDeviceActivity.class);
         intent.putExtra("device_class", "valence");
@@ -102,6 +113,5 @@ public class SelectionActivity extends DevicesActivity {
             return super.onOptionsItemSelected(item);
         }
     }
-
 
 }

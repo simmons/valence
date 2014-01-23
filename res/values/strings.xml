@@ -9,4 +9,6 @@
         Valence turns your Android phone or tablet into a remote
         keyboard and mouse for any computer running a VNC server.
     </string>
+    <string name="pref_SHOW_TOUCHPAD_HINT_OVERLAY">Show hints</string>
+    <string name="pref_SHOW_TOUCHPAD_HINT_OVERLAY_summary">Show UI hints on the touchpad</string>
 </resources>

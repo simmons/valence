@@ -19,10 +19,12 @@ package com.cafbit.valence;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -31,10 +33,13 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
+import com.cafbit.valence.config.PreferencesConstants;
+
 public class TouchPadView extends View {
 
     private TouchPadHandler touchPadHandler;
     private DisplayMetrics metrics = new DisplayMetrics();
+    private final SharedPreferences preferences;
 
     public static interface OnTouchPadEventListener {
         public void onTouchPadEvent(TouchPadEvent event);
@@ -47,7 +52,7 @@ public class TouchPadView extends View {
         this.setBackgroundColor(Color.BLACK);
 
         if (context instanceof Activity) {
-            ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(metrics);
             xdpi = metrics.xdpi;
             ydpi = metrics.ydpi;
         } else {
@@ -55,6 +60,7 @@ public class TouchPadView extends View {
         }
 
         touchPadHandler = new TouchPadHandler(this, xdpi, ydpi);
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         drawSetup();
     }
@@ -68,12 +74,12 @@ public class TouchPadView extends View {
         return touchPadHandler.onTouchEvent(event);
     }
 
-    /////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
 
     private Paint linePaint = new Paint();
     private Paint grayLinePaint = new Paint();
     private Paint fontPaint = new Paint();
-    //private Path cornerPath;
+    // private Path cornerPath;
     final int s = 4; // spacing
     final int l = 20; // length
 
@@ -90,22 +96,17 @@ public class TouchPadView extends View {
 
         fontPaint.setTextSize(24.0f);
         fontPaint.setColor(Color.WHITE);
-        //fontPaint.setStrokeWidth(2.0f);
+        // fontPaint.setStrokeWidth(2.0f);
         fontPaint.setStyle(Paint.Style.STROKE);
         fontPaint.setAntiAlias(true);
 
         /*
-        // define the corner path
-        cornerPath = new Path();
-        cornerPath.moveTo(l+s, 0);
-        cornerPath.lineTo(0, 0);
-        cornerPath.lineTo(0, l+s);
-        cornerPath.moveTo(l+s, s);
-        cornerPath.lineTo(s, s);
-        cornerPath.lineTo(s, l+s);
-        cornerPath.moveTo(s, s);
-        cornerPath.lineTo(l+s, l+s);
-        */
+         * // define the corner path cornerPath = new Path();
+         * cornerPath.moveTo(l+s, 0); cornerPath.lineTo(0, 0);
+         * cornerPath.lineTo(0, l+s); cornerPath.moveTo(l+s, s);
+         * cornerPath.lineTo(s, s); cornerPath.lineTo(s, l+s);
+         * cornerPath.moveTo(s, s); cornerPath.lineTo(l+s, l+s);
+         */
     }
 
     private static class TextBox {
@@ -132,14 +133,14 @@ public class TouchPadView extends View {
         Rect bounds = new Rect();
         int viewWidth = getWidth();
         int viewHeight = getHeight();
-        int targetWidth = (int)(viewWidth*0.75);
-        int maxHeight = (int)(viewHeight*0.75);
+        int targetWidth = (int) (viewWidth * 0.75);
+        int maxHeight = (int) (viewHeight * 0.75);
         float ts = 25.0f;
         final int MAX_TEXT_SIZE = 32;
         TextBox box;
 
         // calculate the optimal text size
-        int i=0;
+        int i = 0;
         while (true) {
             fontPaint.setTextSize(ts);
             box = getTextBox(fontPaint, lines);
@@ -147,12 +148,12 @@ public class TouchPadView extends View {
             float adjustment;
             boolean isYadjustment = false;
             if (box.h > maxHeight) {
-                adjustment = maxHeight/(float)box.h;
+                adjustment = maxHeight / (float) box.h;
                 isYadjustment = true;
             } else {
-                adjustment = targetWidth/(float)box.w;
+                adjustment = targetWidth / (float) box.w;
             }
-            if (((i>=9) && (!isYadjustment)) || (i>=12) || (adjustment > 0.99f && adjustment < 1.05f)) {
+            if (((i >= 9) && (!isYadjustment)) || (i >= 12) || (adjustment > 0.99f && adjustment < 1.05f)) {
                 break;
             } else {
                 ts = ts * adjustment;
@@ -164,16 +165,17 @@ public class TouchPadView extends View {
             fontPaint.setTextSize(ts);
         }
         box = getTextBox(fontPaint, lines);
-        //System.out.printf("canvas: %dx%d  textbox: %dx%d  size: %f\n", viewWidth, viewHeight, textWidth, textHeight, ts);
+        // System.out.printf("canvas: %dx%d  textbox: %dx%d  size: %f\n",
+        // viewWidth, viewHeight, textWidth, textHeight, ts);
 
         // draw the text
-        float ypos = viewHeight*yposPercent - ((float)box.h/2.0f) + ts;
+        float ypos = viewHeight * yposPercent - (box.h / 2.0f) + ts;
         if (ypos < ts) {
             ypos = ts;
         }
         for (String line : lines) {
             float tw = fontPaint.measureText(line);
-            canvas.drawText(line, (viewWidth-tw)/2, ypos, fontPaint);
+            canvas.drawText(line, (viewWidth - tw) / 2, ypos, fontPaint);
             ypos += fontPaint.getFontSpacing();
         }
 
@@ -182,7 +184,7 @@ public class TouchPadView extends View {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right,
             int bottom) {
-        //System.out.println("----- onLayout:"+changed+", "+left+", "+top+", "+right+", "+bottom);
+        // System.out.println("----- onLayout:"+changed+", "+left+", "+top+", "+right+", "+bottom);
         invalidate();
         // TODO Auto-generated method stub
         super.onLayout(changed, left, top, right, bottom);
@@ -194,42 +196,44 @@ public class TouchPadView extends View {
         int h = this.getHeight();
 
         float boxPoints[] = new float[] {
-            0, 0, w, 0,
-            w, 0, w, h,
-            w, h, 0, h,
-            0, h, 0, 0
+                0, 0, w, 0,
+                w, 0, w, h,
+                w, h, 0, h,
+                0, h, 0, 0
         };
         float xPoints[] = new float[] {
-            // "X"
-            2, 2, w-2, h-2,
-            2, h-2, w-2, 2,
-            // side marks
-            4, h/2-15, 4, h/2+15,
-            4, h/2, 4+30, h/2,
-            w-4, h/2-15, w-4, h/2+15,
-            w-4, h/2, w-4-30, h/2,
-            w/2-15, 4, w/2+15, 4,
-            w/2, 4, w/2, 4+30,
-            w/2-15, h-4, w/2+15, h-4,
-            w/2, h-4, w/2, h-4-30,
+                // "X"
+                2, 2, w - 2, h - 2,
+                2, h - 2, w - 2, 2,
+                // side marks
+                4, h / 2 - 15, 4, h / 2 + 15,
+                4, h / 2, 4 + 30, h / 2,
+                w - 4, h / 2 - 15, w - 4, h / 2 + 15,
+                w - 4, h / 2, w - 4 - 30, h / 2,
+                w / 2 - 15, 4, w / 2 + 15, 4,
+                w / 2, 4, w / 2, 4 + 30,
+                w / 2 - 15, h - 4, w / 2 + 15, h - 4,
+                w / 2, h - 4, w / 2, h - 4 - 30,
         };
         canvas.drawLines(boxPoints, linePaint);
         canvas.drawLines(xPoints, grayLinePaint);
 
-        renderText(canvas, 0.5f, new String[] {
-            "Use this area as a touchpad.",
-            "Tap to click.",
-            "Tap then swipe to drag.",
-            "Two-finger tap to right click.",
-            "Two-finger swipe to scroll."
-        });
+        if (preferences.getBoolean(PreferencesConstants.SHOW_TOUCHPAD_HINT_OVERLAY, true)) {
+            renderText(canvas, 0.5f, new String[] {
+                    "Use this area as a touchpad.",
+                    "Tap to click.",
+                    "Tap then swipe to drag.",
+                    "Two-finger tap to right click.",
+                    "Two-finger swipe to scroll."
+            });
+        }
 
         return;
     }
 
-    /////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
     // Input management
-    /////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
 
     @Override
     public boolean onCheckIsTextEditor() {
@@ -237,14 +241,15 @@ public class TouchPadView extends View {
     }
 
     /**
-     * The HTC soft keyboard requires us to manage the keyboard input,
-     * and backspace over discarded characters if the user performed
-     * a long-press to select an alternative character.
+     * The HTC soft keyboard requires us to manage the keyboard input, and
+     * backspace over discarded characters if the user performed a long-press to
+     * select an alternative character.
      */
     public static class ValenceInputConnection extends BaseInputConnection {
         public ValenceInputConnection(View targetView, boolean fullEditor) {
             super(targetView, fullEditor);
         }
+
         @Override
         public boolean deleteSurroundingText(int leftLength, int rightLength) {
             boolean valid = true;
@@ -252,9 +257,9 @@ public class TouchPadView extends View {
             if ((rightLength == 0) && (leftLength == 0)) {
                 valid = this.sendKeyEvent(deleteEvent);
             } else {
-                for (int i=0; i<leftLength; i++) {
+                for (int i = 0; i < leftLength; i++) {
                     valid = this.sendKeyEvent(deleteEvent);
-                    if (! valid) {
+                    if (!valid) {
                         break;
                     }
                 }
@@ -264,9 +269,9 @@ public class TouchPadView extends View {
     }
 
     /**
-     * The HTC soft keyboard requires us to manage the keyboard input,
-     * and backspace over discarded characters if the user performed
-     * a long-press to select an alternative character.
+     * The HTC soft keyboard requires us to manage the keyboard input, and
+     * backspace over discarded characters if the user performed a long-press to
+     * select an alternative character.
      */
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {

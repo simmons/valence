@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_SHOW_TOUCHPAD_HINT_OVERLAY"
+        android:title="@string/pref_SHOW_TOUCHPAD_HINT_OVERLAY"
+        android:summary="@string/pref_SHOW_TOUCHPAD_HINT_OVERLAY_summary"
+        android:defaultValue="true" />
+</PreferenceScreen>

@@ -1,6 +1,8 @@
 /*
  * Copyright 2011 David Simmons
  * http://cafbit.com/
+ * 
+ * Copyright 2014 Alexandre Quesnel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +46,10 @@ public class OptionsMenuHelper {
             return true;
         } else if (itemId == R.id.help) {
             Intent intent = new Intent(activity, HelpActivity.class);
+            activity.startActivity(intent);
+            return true;
+        } else if (itemId == R.id.settings) {
+            Intent intent = new Intent(activity, PreferencesActivity.class);
             activity.startActivity(intent);
             return true;
         } else {
