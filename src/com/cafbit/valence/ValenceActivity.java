@@ -1,6 +1,8 @@
 /*
  * Copyright 2011 David Simmons
  * http://cafbit.com/
+ * 
+ * Copyright (C) 2014 Alexandre Quesnel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +29,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,6 +58,7 @@ import com.cafbit.valence.rfb.RFBPointerEvent;
 import com.cafbit.valence.rfb.RFBSecurity;
 import com.cafbit.valence.rfb.RFBSecurityARD;
 import com.cafbit.valence.rfb.RFBSecurityVNC;
+
 //import com.cafbit.motelib.R;
 
 public class ValenceActivity extends Activity implements OnTouchPadEventListener {
@@ -80,6 +84,8 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     private ToggleButton modButton = null;
     private ToggleButton keyButton = null;
     private SpecialKey modifier = null;
+
+    private PoximityCheckBlanker proximityCheckBlanker = null;
 
     //////////////////////////////////////////////////////////////////////
     // Activity lifecycle
@@ -109,6 +115,15 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             this.macAuthentication = true;
         }
         this.username = uri.getQueryParameter("username");
+
+        LinearLayout baseLayout = new LinearLayout(this);
+        baseLayout.setOrientation(LinearLayout.VERTICAL);
+
+        View blankView = new View(this);
+        blankView.setId(R.id.blank);
+        blankView.setBackgroundColor(Color.BLACK);
+        blankView.setVisibility(View.GONE);
+        blankView.setClickable(true);
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -172,7 +187,10 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         layout.addView(touchPadView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1));
         layout.addView(buttonLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0));
 
-        setContentView(layout);
+        baseLayout.addView(blankView);
+        baseLayout.addView(layout);
+
+        setContentView(baseLayout);
 
         touchPadView.setFocusable(true);
         touchPadView.setFocusableInTouchMode(true);
@@ -212,6 +230,11 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             }
         }
 
+        if (null == proximityCheckBlanker) {
+            proximityCheckBlanker = new PoximityCheckBlanker(this);
+            proximityCheckBlanker.enableProximitySensor();
+            Log.w(TAG, "enabled the proximity sensor");
+        }
     }
 
     /**
@@ -229,6 +252,12 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             if (rfbHandler != null) {
                 rfbThread.getHandler().onActivityPause();
             }
+        }
+
+        if (null != proximityCheckBlanker) {
+            proximityCheckBlanker.disableProximitySensor(true);
+            proximityCheckBlanker = null;
+            Log.w(TAG, "disabled the proximity sensor");
         }
 
     }
@@ -509,7 +538,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             rpe.sx = tpe.sx;
 
             // send the RFBPointerEvent
-//tpe.debug();
+            //tpe.debug();
             rfbThread.getHandler().onRFBEvent(rpe);
         }
     }
