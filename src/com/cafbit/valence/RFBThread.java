@@ -18,7 +18,6 @@
 package com.cafbit.valence;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -32,8 +31,8 @@ import com.cafbit.valence.rfb.RFBSecurity;
 
 public class RFBThread extends Thread {
 
-    private static final long DETACH_TIMEOUT = 10*1000; // 10 seconds
-    private static final long ACTIVITY_TIMEOUT = 10*60*1000; // 10 minutes
+    private static final long DETACH_TIMEOUT = 10 * 1000; // 10 seconds
+    private static final long ACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
     private static int serial = 0;
 
@@ -46,18 +45,19 @@ public class RFBThread extends Thread {
     public RFBThread(ValenceHandler handler, String address, int port, RFBSecurity security) {
         this.parentHandler = handler;
         this.conn = new RFBConnection(address, port, security);
-        setName("rfb-"+(serial++));
+        setName("rfb-" + (serial++));
     }
 
     public RFBThread(ValenceHandler handler, String address, RFBSecurity security) {
         this.parentHandler = handler;
         this.conn = new RFBConnection(address, security);
-        setName("rfb-"+(serial++));
+        setName("rfb-" + (serial++));
     }
 
     public void setArd35Compatibility(boolean ard35Compatibility) {
         this.conn.setArd35Compatibility(ard35Compatibility);
     }
+
     public boolean getArd35Compatibility() {
         return this.conn.getArd35Compatibility();
     }
@@ -142,7 +142,7 @@ public class RFBThread extends Thread {
                 if (recvThread != null) {
                     recvThread.invalidate();
                 }
-                parentHandler.error((Throwable)msg.obj);
+                parentHandler.error((Throwable) msg.obj);
                 Looper.myLooper().quit();
                 break;
             case MSG_RECV_DISCONNECT:
@@ -153,7 +153,7 @@ public class RFBThread extends Thread {
                 Looper.myLooper().quit();
                 break;
             case MSG_RFB_EVENT:
-                RFBEvent event = (RFBEvent)msg.obj;
+                RFBEvent event = (RFBEvent) msg.obj;
                 try {
                     conn.sendEvent(event);
                 } catch (IOException e) {
@@ -201,6 +201,6 @@ public class RFBThread extends Thread {
         public void onActivityResume() {
             removeMessages(MSG_TIMEOUT);
         }
-}
+    }
 
 }

@@ -20,23 +20,13 @@ package com.cafbit.valence;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-//import com.cafbit.motelib.R;
-import com.cafbit.valence.RFBThread.RFBThreadHandler;
-import com.cafbit.valence.TouchPadView.OnTouchPadEventListener;
-import com.cafbit.valence.rfb.RFBKeyEvent;
-import com.cafbit.valence.rfb.RFBPointerEvent;
-import com.cafbit.valence.rfb.RFBSecurity;
-import com.cafbit.valence.rfb.RFBSecurityARD;
-import com.cafbit.valence.rfb.RFBSecurityVNC;
-import com.cafbit.valence.rfb.RFBKeyEvent.SpecialKey;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,18 +34,28 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ToggleButton;
-import android.widget.ImageView.ScaleType;
+
+import com.cafbit.valence.RFBThread.RFBThreadHandler;
+import com.cafbit.valence.TouchPadView.OnTouchPadEventListener;
+import com.cafbit.valence.rfb.RFBKeyEvent;
+import com.cafbit.valence.rfb.RFBKeyEvent.SpecialKey;
+import com.cafbit.valence.rfb.RFBPointerEvent;
+import com.cafbit.valence.rfb.RFBSecurity;
+import com.cafbit.valence.rfb.RFBSecurityARD;
+import com.cafbit.valence.rfb.RFBSecurityVNC;
+//import com.cafbit.motelib.R;
 
 public class ValenceActivity extends Activity implements OnTouchPadEventListener {
     private static final String TAG = "Valence";
@@ -101,11 +101,11 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         this.port = uri.getPort();
         this.password = uri.getQueryParameter("password");
         if ((uri.getQueryParameter("ard35Compatibility") != null) &&
-            (uri.getQueryParameter("ard35Compatibility").equals("true"))) {
+                (uri.getQueryParameter("ard35Compatibility").equals("true"))) {
             this.ard35Compatibility = true;
         }
         if ((uri.getQueryParameter("macAuthentication") != null) &&
-            (uri.getQueryParameter("macAuthentication").equals("true"))) {
+                (uri.getQueryParameter("macAuthentication").equals("true"))) {
             this.macAuthentication = true;
         }
         this.username = uri.getQueryParameter("username");
@@ -189,7 +189,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     /**
      * This is called when the user resumes using the activity
      * after using other programs (and at activity creation time).
-     *
+     * 
      * We don't keep the network thread running when the user is
      * not running this program in the foreground, so we use this
      * method to initialize the packet list and start the
@@ -201,7 +201,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
 
         isRunning = true;
 
-        if (! rfbThread.isAlive()) {
+        if (!rfbThread.isAlive()) {
             Log.w(TAG, "rfbThread is disconnected -- reconnect.");
             rfbThread = null;
             startThread();
@@ -216,7 +216,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
 
     /**
      * This is called when the user leaves the activity to run
-     * another program.  We stop the network thread when this
+     * another program. We stop the network thread when this
      * happens.
      */
     @Override
@@ -295,15 +295,15 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         super.onCreateContextMenu(menu, v, menuInfo);
         if (v.equals(modButton)) {
             menu.setHeaderTitle("Modifier keys");
-            for (int i=0; i<RFBKeyEvent.MODIFIERS.length; i++) {
+            for (int i = 0; i < RFBKeyEvent.MODIFIERS.length; i++) {
                 SpecialKey key = RFBKeyEvent.MODIFIERS[i];
-                menu.add(Menu.NONE, (1<<16) | i, Menu.NONE, key.name);
+                menu.add(Menu.NONE, (1 << 16) | i, Menu.NONE, key.name);
             }
         } else if (v.equals(keyButton)) {
             menu.setHeaderTitle("Special keys");
-            for (int i=0; i<RFBKeyEvent.SPECIALS.length; i++) {
+            for (int i = 0; i < RFBKeyEvent.SPECIALS.length; i++) {
                 SpecialKey key = RFBKeyEvent.SPECIALS[i];
-                menu.add(Menu.NONE, (2<<16) | i, Menu.NONE, key.name);
+                menu.add(Menu.NONE, (2 << 16) | i, Menu.NONE, key.name);
             }
 
         }
@@ -401,10 +401,11 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     }
 
     private ProgressDialog connectDialog;
+
     private void startConnectDialog() {
         connectDialog = new ProgressDialog(this);
         connectDialog.setIndeterminate(true);
-        connectDialog.setMessage("Connecting to "+address);
+        connectDialog.setMessage("Connecting to " + address);
         connectDialog.show();
         connectDialog.setOnCancelListener(new OnCancelListener() {
             @Override
@@ -477,7 +478,6 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     }
     */
 
-
     private void sendKey(RFBKeyEvent rfbKeyEvent) {
         if (isConnected()) {
             rfbThread.getHandler().onRFBEvent(rfbKeyEvent);
@@ -517,6 +517,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     //
 
     private boolean finishOnAlert = false;
+
     private void alert(String title, String message) {
         stopConnectDialog();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -538,20 +539,30 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
 
     public interface ValenceHandler {
         public void error(Throwable throwable);
+
         public void onConnect();
+
         public void onDisconnect();
+
         public void onAbnormalDisconnect();
     };
 
     public static class ValenceDetachedHandler implements ValenceHandler {
         @Override
-        public void error(Throwable throwable) {}
+        public void error(Throwable throwable) {
+        }
+
         @Override
-        public void onAbnormalDisconnect() {}
+        public void onAbnormalDisconnect() {
+        }
+
         @Override
-        public void onConnect() {}
+        public void onConnect() {
+        }
+
         @Override
-        public void onDisconnect() {}
+        public void onDisconnect() {
+        }
     };
 
     public class ValenceHandlerImpl extends Handler implements ValenceHandler {
@@ -565,7 +576,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            if (! isRunning) {
+            if (!isRunning) {
                 return;
             }
 
@@ -574,12 +585,12 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
                 finishOnAlert = true;
                 String text;
                 if (msg.obj instanceof IOException) {
-                    msg.obj = new ValenceIOException((IOException)msg.obj);
+                    msg.obj = new ValenceIOException((IOException) msg.obj);
                 }
                 if (msg.obj instanceof UnknownHostException) {
-                    text = "unknown host: "+((Throwable)msg.obj).getMessage();
+                    text = "unknown host: " + ((Throwable) msg.obj).getMessage();
                 } else {
-                    text = ((Throwable)msg.obj).getMessage();
+                    text = ((Throwable) msg.obj).getMessage();
                 }
                 alert("Error", text);
                 break;
@@ -599,22 +610,25 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
 
         // helper methods
 
+        @Override
         public void error(Throwable throwable) {
             sendMessage(Message.obtain(this, MSG_ERROR, throwable));
         }
 
+        @Override
         public void onConnect() {
             sendMessage(Message.obtain(this, MSG_CONNECT));
         }
 
+        @Override
         public void onDisconnect() {
             sendMessage(Message.obtain(this, MSG_DISCONNECT));
         }
 
+        @Override
         public void onAbnormalDisconnect() {
             sendMessage(Message.obtain(this, MSG_ABNORMAL_DISCONNECT));
         }
     }
-
 
 }
