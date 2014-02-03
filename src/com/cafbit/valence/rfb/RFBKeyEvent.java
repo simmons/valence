@@ -25,11 +25,13 @@ public class RFBKeyEvent implements RFBEvent {
         public String name;
         public String shortName;
         public int keysym;
+
         public SpecialKey(String name, int keysym) {
             this.name = name;
             this.shortName = name;
             this.keysym = keysym;
         }
+
         public SpecialKey(String name, String shortName, int keysym) {
             this.name = name;
             this.shortName = shortName;
@@ -38,27 +40,26 @@ public class RFBKeyEvent implements RFBEvent {
     };
 
     public static final SpecialKey MODIFIERS[] = {
-        new SpecialKey("Shift", "shift", 0xFFE1),
-        new SpecialKey("Ctrl", "ctrl", 0xFFE3),
-        new SpecialKey("Alt", "alt", 0xFFE9),
-        new SpecialKey("Win/Cmd", "win", 0xFFEB)
+            new SpecialKey("Shift", "shift", 0xFFE1),
+            new SpecialKey("Ctrl", "ctrl", 0xFFE3),
+            new SpecialKey("Alt", "alt", 0xFFE9),
+            new SpecialKey("Win/Cmd", "win", 0xFFEB)
     };
 
     public static final SpecialKey SPECIALS[] = {
-        new SpecialKey("Esc", 0xFF1B),
-        new SpecialKey("Tab", 0xFF09),
-        new SpecialKey("F1",  0xFFBE),
-        new SpecialKey("F2",  0xFFBF),
-        new SpecialKey("F3",  0xFFC0),
-        new SpecialKey("F4",  0xFFC1),
-        new SpecialKey("F5",  0xFFC2),
-        new SpecialKey("F6",  0xFFC3),
-        new SpecialKey("F7",  0xFFC4),
-        new SpecialKey("F8",  0xFFC5),
-        new SpecialKey("F9",  0xFFC6),
-        new SpecialKey("F10", 0xFFC7)
+            new SpecialKey("Esc", 0xFF1B),
+            new SpecialKey("Tab", 0xFF09),
+            new SpecialKey("F1", 0xFFBE),
+            new SpecialKey("F2", 0xFFBF),
+            new SpecialKey("F3", 0xFFC0),
+            new SpecialKey("F4", 0xFFC1),
+            new SpecialKey("F5", 0xFFC2),
+            new SpecialKey("F6", 0xFFC3),
+            new SpecialKey("F7", 0xFFC4),
+            new SpecialKey("F8", 0xFFC5),
+            new SpecialKey("F9", 0xFFC6),
+            new SpecialKey("F10", 0xFFC7)
     };
-
 
     // the android key event will be stored in one of the following three formats:
     KeyEvent keyEvent;
@@ -85,5 +86,4 @@ public class RFBKeyEvent implements RFBEvent {
         this.ch = ch;
         this.modifier = modifier;
     }
-
 }
