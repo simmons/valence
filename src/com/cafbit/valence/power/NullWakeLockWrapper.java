@@ -14,10 +14,27 @@
  * limitations under the License.
  */
 
-package com.cafbit.valence.config;
+package com.cafbit.valence.power;
 
-public class PreferencesConstants {
-    public static final String SHOW_TOUCHPAD_HINT_OVERLAY = "pref_SHOW_TOUCHPAD_HINT_OVERLAY";
-    public static final String PROXIMITY_TIMEOUT_MILLISECONDS = "pref_PROXIMITY_TIMEOUT_MILLISECONDS";
-    public static final String SCREEN_OFF_ON_PROXIMITY_SENSOR = "pref_SCREEN_OFF_ON_PROXIMITY_SENSOR";
+/**
+ * A WakeLockWrapper that never holds a wake lock.
+ * 
+ */
+public class NullWakeLockWrapper implements WakeLockWrapper {
+    @Override
+    public void acquire(long timeout) {
+    }
+
+    @Override
+    public void release() {
+    }
+
+    @Override
+    public void release(int flags) {
+    }
+
+    @Override
+    public boolean isHeld() {
+        return false;
+    }
 }

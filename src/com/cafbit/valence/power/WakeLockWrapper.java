@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package com.cafbit.valence.config;
+package com.cafbit.valence.power;
 
-public class PreferencesConstants {
-    public static final String SHOW_TOUCHPAD_HINT_OVERLAY = "pref_SHOW_TOUCHPAD_HINT_OVERLAY";
-    public static final String PROXIMITY_TIMEOUT_MILLISECONDS = "pref_PROXIMITY_TIMEOUT_MILLISECONDS";
-    public static final String SCREEN_OFF_ON_PROXIMITY_SENSOR = "pref_SCREEN_OFF_ON_PROXIMITY_SENSOR";
+/**
+ * A wrapper of the WakeLock class that allows access to the hidden APIs.
+ * 
+ * NOTE: Put all access to hidden and regular WakeLock APIs in here to
+ * have a central class for managing those APIs.
+ */
+public interface WakeLockWrapper {
+    public void acquire(long timeout);
+
+    public void release();
+
+    public void release(int flags);
+
+    public boolean isHeld();
 }

@@ -11,4 +11,6 @@
     </string>
     <string name="pref_SHOW_TOUCHPAD_HINT_OVERLAY">Show hints</string>
     <string name="pref_SHOW_TOUCHPAD_HINT_OVERLAY_summary">Show UI hints on the touchpad</string>
+    <string name="pref_SCREEN_OFF_ON_PROXIMITY_SENSOR">Proximity Sensor</string>
+    <string name="pref_SCREEN_OFF_ON_PROXIMITY_SENSOR_summary">Turn off the screen using the proximity sensor</string>
 </resources>
