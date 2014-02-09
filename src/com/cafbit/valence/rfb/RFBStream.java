@@ -22,7 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.util.Log;
+
 public class RFBStream {
+
+    private static final String LOG_TAG = RFBStream.class.getName();
 
     private static final int BUFFER_SIZE = 4096;
     private byte[] buffer = new byte[BUFFER_SIZE];
@@ -240,34 +244,21 @@ public class RFBStream {
 
     public void sendKey(RFBKeyEvent keyEvent) throws IOException {
         // resolve the keysym
-        int keysym;
-        if (keyEvent.special != null) {
-            keysym = keyEvent.special.keysym;
-        } else if (keyEvent.ch != 0) {
-            keysym = KeyTranslator.translate(keyEvent.ch);
-        } else {
-            keysym = KeyTranslator.translate(keyEvent.keyEvent);
-            if (keysym == 0) {
-                return;
-            }
-        }
+        int keysym = keyEvent.getKeySym();
         if (keysym == 0) {
             return;
         }
 
-        if (keyEvent.modifier != null) {
-            sendKeyDown(keyEvent.modifier.keysym);
+        if (keyEvent.getAction().isKeyDown()) {
+            sendKeyDown(keysym);
         }
-
-        sendKeyDown(keysym);
-        sendKeyUp(keysym);
-
-        if (keyEvent.modifier != null) {
-            sendKeyUp(keyEvent.modifier.keysym);
+        if (keyEvent.getAction().isKeyUp()) {
+            sendKeyUp(keysym);
         }
     }
 
     private void sendKeyDown(int keysym) throws IOException {
+        Log.d(LOG_TAG, "sending key DOWN event for key symbol : 0x" + Integer.toHexString(keysym));
         byte[] keyDown = new byte[] {
                 0x04, // message-type
                 0x01, // down-flag
@@ -281,6 +272,7 @@ public class RFBStream {
     }
 
     private void sendKeyUp(int keysym) throws IOException {
+        Log.d(LOG_TAG, "sending key UP   event for key symbol : 0x" + Integer.toHexString(keysym));
         byte[] keyUp = new byte[] {
                 0x04, // message-type
                 0x00, // down-flag

@@ -56,6 +56,7 @@ import com.cafbit.valence.RFBThread.RFBThreadHandler;
 import com.cafbit.valence.TouchPadView.OnTouchPadEventListener;
 import com.cafbit.valence.power.WakeLockFactory;
 import com.cafbit.valence.rfb.RFBKeyEvent;
+import com.cafbit.valence.rfb.RFBKeyEvent.Action;
 import com.cafbit.valence.rfb.RFBKeyEvent.SpecialKey;
 import com.cafbit.valence.rfb.RFBPointerEvent;
 import com.cafbit.valence.rfb.RFBSecurity;
@@ -351,7 +352,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             // key menu
             if ((minor >= 0) && (minor < RFBKeyEvent.SPECIALS.length)) {
                 SpecialKey key = RFBKeyEvent.SPECIALS[minor];
-                sendKey(new RFBKeyEvent(key, modifier));
+                sendKey(new RFBKeyEvent(key, Action.KEY_DOWN_AND_UP));
             }
             break;
         }
@@ -457,7 +458,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         if ((keyCode == KeyEvent.KEYCODE_MENU) || (keyCode == KeyEvent.KEYCODE_BACK)) {
             return super.onKeyDown(keyCode, keyEvent);
         }
-        sendKey(new RFBKeyEvent(keyEvent, modifier));
+        sendKey(new RFBKeyEvent(keyEvent));
         return true;
     }
 
@@ -469,7 +470,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             String chars = keyEvent.getCharacters();
             if (chars != null) {
                 for (char c : chars.toCharArray()) {
-                    sendKey(new RFBKeyEvent(c, modifier));
+                    sendKey(new RFBKeyEvent(c));
                 }
             }
             return true;
@@ -503,8 +504,12 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
 
     private void sendKey(RFBKeyEvent rfbKeyEvent) {
         if (isConnected()) {
+            if (modifier != null) {
+                rfbThread.getHandler().onRFBEvent(new RFBKeyEvent(modifier, Action.KEY_DOWN));
+            }
             rfbThread.getHandler().onRFBEvent(rfbKeyEvent);
             if (modifier != null) {
+                rfbThread.getHandler().onRFBEvent(new RFBKeyEvent(modifier, Action.KEY_UP));
                 modifier = null;
                 modButton.setChecked(false);
             }
