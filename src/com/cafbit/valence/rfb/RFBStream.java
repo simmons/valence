@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import android.view.KeyEvent;
-
 public class RFBStream {
 
     private static final int BUFFER_SIZE = 4096;
@@ -35,6 +33,7 @@ public class RFBStream {
     private enum State {
         NEED_VERSION
     };
+
     private State state = State.NEED_VERSION;
 
     public RFBStream(InputStream inputStream, OutputStream outputStream) {
@@ -53,9 +52,9 @@ public class RFBStream {
 
         while (pos < length) {
             //System.out.println("reading.  pos="+pos+" length="+length);
-            int nbytes = inputStream.read(buffer, pos, length-pos);
+            int nbytes = inputStream.read(buffer, pos, length - pos);
             if (nbytes != -1) {
-                pos+=nbytes;
+                pos += nbytes;
             }
         }
         //System.out.println("read:\n"+Util.hexDump(buffer));
@@ -67,14 +66,17 @@ public class RFBStream {
         byte[] ba = read(1);
         return ba[0];
     }
+
     int readShort() throws IOException {
         byte[] ba = read(2);
-        return (0xFF & (int)ba[0])<<8 | (0xFF & (int)ba[1])<<0;
+        return (0xFF & ba[0]) << 8 | (0xFF & ba[1]) << 0;
     }
+
     int readInt() throws IOException {
         byte[] ba = read(4);
-        return ba[0]<<24 | ba[1]<<16 | ba[2]<<8 | ba[3];
+        return ba[0] << 24 | ba[1] << 16 | ba[2] << 8 | ba[3];
     }
+
     String readString() throws IOException {
         int length = readInt();
         byte[] buffer = read(length);
@@ -85,10 +87,12 @@ public class RFBStream {
         //System.out.println("write:\n"+Util.hexDump(ba));
         outputStream.write(ba);
     }
+
     void writeByte(int b) throws IOException {
         //byte[] ba = new byte[1]; ba[0] = (byte)b; System.out.println("write:\n"+Util.hexDump(ba));
         outputStream.write(b);
     }
+
     void write(RFBMessage message) throws IOException {
         //System.out.println("write:\n"+Util.hexDump(message.getBytes()));
         outputStream.write(message.getBytes());
@@ -119,7 +123,7 @@ public class RFBStream {
             securityTypes = read(num);
         } else {
             securityTypes = new byte[1];
-            securityTypes[0] = (byte)readInt();
+            securityTypes[0] = (byte) readInt();
             if (securityTypes[0] == RFBConnection.SECURITY_INVALID) {
                 return null;
             }
@@ -144,8 +148,8 @@ public class RFBStream {
         String name = readString();
 
         // parse the ServerInit
-        int width = (buf[0]&0xFF)<<8 | (int)(buf[1] & 0xFF);
-        int height = (buf[2]&0xFF)<<8 | (int)(buf[3] & 0xFF);
+        int width = (buf[0] & 0xFF) << 8 | buf[1] & 0xFF;
+        int height = (buf[2] & 0xFF) << 8 | buf[3] & 0xFF;
 
         //System.out.println("server-init: \""+name+"\" "+width+"x"+height);
         return new Object[] { name, width, height };
@@ -197,10 +201,10 @@ public class RFBStream {
 
     public void sendPointerEvent(byte buttons, int x, int y) throws IOException {
         byte[] pointerEvent = new byte[] {
-            0x05, // message-type
-            buttons, // button-mask
-            (byte)((x&0xFF00)>>8), (byte)(x&0xFF),
-            (byte)((y&0xFF00)>>8), (byte)(y&0xFF),
+                0x05, // message-type
+                buttons, // button-mask
+                (byte) ((x & 0xFF00) >> 8), (byte) (x & 0xFF),
+                (byte) ((y & 0xFF00) >> 8), (byte) (y & 0xFF),
         };
         write(pointerEvent);
     }
@@ -211,25 +215,25 @@ public class RFBStream {
      * these things.)
      */
     public void sendMultiplePointerEvents(int iterations, byte setButtons, byte clearButtons, int x, int y) throws IOException {
-        byte[] buffer = new byte[6*iterations*2];
-        byte x1 = (byte)((x&0xFF00)>>8);
-        byte x2 = (byte)(x&0xFF);
-        byte y1 = (byte)((y&0xFF00)>>8);
-        byte y2 = (byte)(y&0xFF);
-        for (int i=0; i<iterations; i++) {
-            int n = 6*i*2;
-            buffer[n]   = 0x05;         // message-type
-            buffer[n+1] = setButtons;   // button-mask
-            buffer[n+2] = x1;
-            buffer[n+3] = x2;
-            buffer[n+4] = y1;
-            buffer[n+5] = y2;
-            buffer[n+6] = 0x05;         // message-type
-            buffer[n+7] = clearButtons; // button-mask
-            buffer[n+8] = x1;
-            buffer[n+9] = x2;
-            buffer[n+10] = y1;
-            buffer[n+11] = y2;
+        byte[] buffer = new byte[6 * iterations * 2];
+        byte x1 = (byte) ((x & 0xFF00) >> 8);
+        byte x2 = (byte) (x & 0xFF);
+        byte y1 = (byte) ((y & 0xFF00) >> 8);
+        byte y2 = (byte) (y & 0xFF);
+        for (int i = 0; i < iterations; i++) {
+            int n = 6 * i * 2;
+            buffer[n] = 0x05; // message-type
+            buffer[n + 1] = setButtons; // button-mask
+            buffer[n + 2] = x1;
+            buffer[n + 3] = x2;
+            buffer[n + 4] = y1;
+            buffer[n + 5] = y2;
+            buffer[n + 6] = 0x05; // message-type
+            buffer[n + 7] = clearButtons; // button-mask
+            buffer[n + 8] = x1;
+            buffer[n + 9] = x2;
+            buffer[n + 10] = y1;
+            buffer[n + 11] = y2;
         }
         write(buffer);
     }
@@ -265,26 +269,26 @@ public class RFBStream {
 
     private void sendKeyDown(int keysym) throws IOException {
         byte[] keyDown = new byte[] {
-            0x04, // message-type
-            0x01, // down-flag
-            0x00, 0x00, // padding
-            (byte) ((keysym >> 24) & 0xFF),
-            (byte) ((keysym >> 16) & 0xFF),
-            (byte) ((keysym >> 8) & 0xFF),
-            (byte) ((keysym) & 0xFF)
+                0x04, // message-type
+                0x01, // down-flag
+                0x00, 0x00, // padding
+                (byte) ((keysym >> 24) & 0xFF),
+                (byte) ((keysym >> 16) & 0xFF),
+                (byte) ((keysym >> 8) & 0xFF),
+                (byte) ((keysym) & 0xFF)
         };
         write(keyDown);
     }
 
     private void sendKeyUp(int keysym) throws IOException {
         byte[] keyUp = new byte[] {
-            0x04, // message-type
-            0x00, // down-flag
-            0x00, 0x00, // padding
-            (byte) ((keysym >> 24) & 0xFF),
-            (byte) ((keysym >> 16) & 0xFF),
-            (byte) ((keysym >> 8) & 0xFF),
-            (byte) ((keysym) & 0xFF)
+                0x04, // message-type
+                0x00, // down-flag
+                0x00, 0x00, // padding
+                (byte) ((keysym >> 24) & 0xFF),
+                (byte) ((keysym >> 16) & 0xFF),
+                (byte) ((keysym >> 8) & 0xFF),
+                (byte) ((keysym) & 0xFF)
         };
         write(keyUp);
     }
