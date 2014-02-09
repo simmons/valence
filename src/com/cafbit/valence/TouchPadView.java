@@ -1,6 +1,8 @@
 /*
  * Copyright 2011 David Simmons
  * http://cafbit.com/
+ * 
+ * Copyright (C) 2014 Alexandre Quesnel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +27,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.preference.PreferenceManager;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -33,6 +36,7 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
+import com.cafbit.valence.config.NullSharedPreferences;
 import com.cafbit.valence.config.PreferencesConstants;
 
 public class TouchPadView extends View {
@@ -46,23 +50,35 @@ public class TouchPadView extends View {
     };
 
     public TouchPadView(Context context) {
-        super(context);
+        this(context, null);
+    }
 
-        float xdpi, ydpi;
+    public TouchPadView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        if (pref == null) {
+            preferences = new NullSharedPreferences();
+        } else {
+            preferences = pref;
+        }
+
         this.setBackgroundColor(Color.BLACK);
+        drawSetup();
+
+        if (this.isInEditMode()) {
+            return;
+        }
 
         if (context instanceof Activity) {
             ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            float xdpi, ydpi;
             xdpi = metrics.xdpi;
             ydpi = metrics.ydpi;
+            touchPadHandler = new TouchPadHandler(this, xdpi, ydpi);
         } else {
             throw new RuntimeException("need activity reference for metrics");
         }
-
-        touchPadHandler = new TouchPadHandler(this, xdpi, ydpi);
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        drawSetup();
     }
 
     public void setOnTouchPadEvent(OnTouchPadEventListener onTouchPadEvent) {
