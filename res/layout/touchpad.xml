@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2014 Alexandre Quesnel
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" >
+
+        <com.cafbit.valence.TouchPadView
+            android:id="@+id/touchPad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/userText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="" />
+
+    </RelativeLayout>
+
+    <GridLayout
+        android:id="@+id/layoutFKeyButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:columnCount="7" >
+        
+        <Button
+            android:id="@+id/ButtonF1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f1"
+            android:textOff="@string/f1"
+            android:textOn="@string/f1"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f2"
+            android:textOff="@string/f2"
+            android:textOn="@string/f2"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f3"
+            android:textOff="@string/f3"
+            android:textOn="@string/f3"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f4"
+            android:textOff="@string/f4"
+            android:textOn="@string/f4"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f5"
+            android:textOff="@string/f5"
+            android:textOn="@string/f5"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f6"
+            android:textOff="@string/f6"
+            android:textOn="@string/f6"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f7"
+            android:textOff="@string/f7"
+            android:textOn="@string/f7"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f8"
+            android:textOff="@string/f8"
+            android:textOn="@string/f8"
+            android:onClick="onClickKeyButton" />
+    
+        <Button
+            android:id="@+id/ButtonF9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f9"
+            android:textOff="@string/f9"
+            android:textOn="@string/f9"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f10"
+            android:textOff="@string/f10"
+            android:textOn="@string/f10"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f11"
+            android:textOff="@string/f11"
+            android:textOn="@string/f11"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonF12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/f12"
+            android:textOff="@string/f12"
+            android:textOn="@string/f12"
+            android:onClick="onClickKeyButton" />
+        
+    </GridLayout>
+        
+    <GridLayout
+        android:id="@+id/layoutArrowButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:columnCount="5" >
+        
+        <Button
+            android:id="@+id/ButtonTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tab"
+            android:textOff="@string/tab"
+            android:textOn="@string/tab"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonEsc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/esc"
+            android:textOff="@string/esc"
+            android:textOn="@string/esc"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home"
+            android:textOff="@string/home"
+            android:textOn="@string/home"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/end"
+            android:textOff="@string/end"
+            android:textOn="@string/end"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonPrintScreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/printScreen"
+            android:textOff="@string/printScreen"
+            android:textOn="@string/printScreen"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonPageUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pageUp"
+            android:textOff="@string/pageUp"
+            android:textOn="@string/pageUp"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonPageDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pageDown"
+            android:textOff="@string/pageDown"
+            android:textOn="@string/pageDown"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonBackspace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/backspace"
+            android:textOff="@string/backspace"
+            android:textOn="@string/backspace"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+            android:textOff="@string/delete"
+            android:textOn="@string/delete"
+            android:onClick="onClickKeyButton" />
+
+        <Button
+            android:id="@+id/ButtonInsert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/insert"
+            android:textOff="@string/insert"
+            android:textOn="@string/insert"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/arrowUp"
+            android:textOff="@string/arrowUp"
+            android:textOn="@string/arrowUp"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/arrowDown"
+            android:textOff="@string/arrowDown"
+            android:textOn="@string/arrowDown"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/arrowLeft"
+            android:textOff="@string/arrowLeft"
+            android:textOn="@string/arrowLeft"
+            android:onClick="onClickKeyButton" />
+        
+        <Button
+            android:id="@+id/ButtonRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/arrowRight"
+            android:textOff="@string/arrowRight"
+            android:textOn="@string/arrowRight"
+            android:onClick="onClickKeyButton" />
+        
+    </GridLayout>
+
+	<LinearLayout
+	    android:id="@+id/layoutModifierButtons"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="0"
+	    android:orientation="horizontal" >
+
+	    <ToggleButton
+	        android:id="@+id/ButtonCtrl"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:onClick="onClickKeyButton"
+	        android:text="@string/ctrl"
+	        android:textOff="@string/ctrl"
+	        android:textOn="@string/ctrl" />
+
+	    <ToggleButton
+	        android:id="@+id/ButtonWin"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:onClick="onClickKeyButton"
+	        android:text="@string/win"
+	        android:textOff="@string/win"
+	        android:textOn="@string/win" />
+
+	    <ToggleButton
+	        android:id="@+id/ButtonAlt"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:onClick="onClickKeyButton"
+	        android:text="@string/alt"
+	        android:textOff="@string/alt"
+	        android:textOn="@string/alt" />
+
+	    <ToggleButton
+	        android:id="@+id/ButtonShift"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:onClick="onClickKeyButton"
+	        android:text="@string/shift"
+	        android:textOff="@string/shift"
+	        android:textOn="@string/shift" />
+	</LinearLayout>
+	    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:gravity="left" >
+        
+        <ToggleButton
+            android:id="@+id/ButtonToggleModifierKeys"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClickModifierKeys"
+            android:text="@string/modifierKeys"
+            android:textOff="@string/modifierKeys"
+            android:textOn="@string/modifierKeys" />
+
+        <ToggleButton
+            android:id="@+id/ButtonToggleFKeys"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fKeys" 
+            android:textOff="@string/fKeys"
+            android:textOn="@string/fKeys" 
+            android:onClick="onClickFKeys"/>
+        
+        <ToggleButton
+            android:id="@+id/ButtonToggleArrowKeys"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/arrowKeys" 
+            android:textOff="@string/arrowKeys"
+            android:textOn="@string/arrowKeys" 
+            android:onClick="onClickArrowKeys"/>
+        
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:gravity="right" >
+	
+	        <ImageButton
+	            android:id="@+id/ButtonToggleKeyboard"
+	            android:layout_width="wrap_content"
+	            android:layout_height="match_parent"
+	            android:contentDescription="@string/toggleKeyboard"
+	            android:onClick="onClickKeyboard"
+	            android:scaleType="fitCenter"
+	            android:src="@drawable/keyboard" />
+	
+	    </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

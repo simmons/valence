@@ -20,6 +20,8 @@ package com.cafbit.valence.rfb;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.cafbit.valence.hacks.HackKeyCode;
+
 import android.view.KeyEvent;
 
 public class KeyTranslator {
@@ -1495,7 +1497,7 @@ public class KeyTranslator {
         {KeyEvent.KEYCODE_UNKNOWN,          0},
         {KeyEvent.KEYCODE_SOFT_LEFT,        0},
         {KeyEvent.KEYCODE_SOFT_RIGHT,       0},
-        {KeyEvent.KEYCODE_HOME,             0},
+        {KeyEvent.KEYCODE_HOME,             0xFF50}, // XK_Home
         {KeyEvent.KEYCODE_BACK,             0xFF1B}, // XK_Escape
         {KeyEvent.KEYCODE_CALL,             0},
         {KeyEvent.KEYCODE_ENDCALL,          0},
@@ -1513,17 +1515,20 @@ public class KeyTranslator {
         {KeyEvent.KEYCODE_CLEAR,            0},
         {KeyEvent.KEYCODE_COMMA,            0},
         {KeyEvent.KEYCODE_PERIOD,           0},
-        {KeyEvent.KEYCODE_ALT_LEFT,         0},
-        {KeyEvent.KEYCODE_ALT_RIGHT,        0},
-        {KeyEvent.KEYCODE_SHIFT_LEFT,       0},
-        {KeyEvent.KEYCODE_SHIFT_RIGHT,      0},
-        {KeyEvent.KEYCODE_TAB,              0},
+        {KeyEvent.KEYCODE_ALT_LEFT,         0xFFE9}, // XK_Alt_L
+        {KeyEvent.KEYCODE_ALT_RIGHT,        0xFFEA}, // XK_Alt_R
+        {KeyEvent.KEYCODE_SHIFT_LEFT,       0xFFE1}, // XK_Shift_L
+        {KeyEvent.KEYCODE_SHIFT_RIGHT,      0xFFE2}, // XK_Shift_R
+        {KeyEvent.KEYCODE_CTRL_LEFT,        0xFFE3}, // XK_Control_L
+        {KeyEvent.KEYCODE_CTRL_RIGHT,       0xFFE4}, // XK_Control_R
+        {KeyEvent.KEYCODE_TAB,              0xFF09}, // XK_Tab
         {KeyEvent.KEYCODE_SPACE,            0},
         {KeyEvent.KEYCODE_SYM,              0},
         {KeyEvent.KEYCODE_EXPLORER,         0},
         {KeyEvent.KEYCODE_ENVELOPE,         0},
         {KeyEvent.KEYCODE_ENTER,            0xFF0D}, // XK_Return
         {KeyEvent.KEYCODE_DEL,              0xFF08}, // XK_BackSpace
+        {KeyEvent.KEYCODE_FORWARD_DEL,      0xFFFF}, //  XK_Delete
         {KeyEvent.KEYCODE_GRAVE,            0},
         {KeyEvent.KEYCODE_MINUS,            0},
         {KeyEvent.KEYCODE_EQUALS,           0},
@@ -1541,18 +1546,27 @@ public class KeyTranslator {
         {KeyEvent.KEYCODE_MENU,             0},
         {KeyEvent.KEYCODE_NOTIFICATION,     0},
         {KeyEvent.KEYCODE_SEARCH,           0xFF1B}, // XK_Escape
-        {KeyEvent.KEYCODE_F1,               0xFFBE}, // F1
-        {KeyEvent.KEYCODE_F2,               0xFFBF}, // F2
-        {KeyEvent.KEYCODE_F3,               0xFFC0}, // F3
-        {KeyEvent.KEYCODE_F4,               0xFFC1}, // F4
-        {KeyEvent.KEYCODE_F5,               0xFFC2}, // F5
-        {KeyEvent.KEYCODE_F6,               0xFFC3}, // F6
-        {KeyEvent.KEYCODE_F7,               0xFFC4}, // F7
-        {KeyEvent.KEYCODE_F8,               0xFFC5}, // F8
-        {KeyEvent.KEYCODE_F9,               0xFFC6}, // F9
-        {KeyEvent.KEYCODE_F10,              0xFFC7}, // F10
-        {KeyEvent.KEYCODE_F11,              0xFFC8}, // F11
-        {KeyEvent.KEYCODE_F12,              0xFFC9}, // F12
+        {KeyEvent.KEYCODE_F1,               0xFFBE}, // XK_F1
+        {KeyEvent.KEYCODE_F2,               0xFFBF}, // XK_F2
+        {KeyEvent.KEYCODE_F3,               0xFFC0}, // XK_F3
+        {KeyEvent.KEYCODE_F4,               0xFFC1}, // XK_F4
+        {KeyEvent.KEYCODE_F5,               0xFFC2}, // XK_F5
+        {KeyEvent.KEYCODE_F6,               0xFFC3}, // XK_F6
+        {KeyEvent.KEYCODE_F7,               0xFFC4}, // XK_F7
+        {KeyEvent.KEYCODE_F8,               0xFFC5}, // XK_F8
+        {KeyEvent.KEYCODE_F9,               0xFFC6}, // XK_F9
+        {KeyEvent.KEYCODE_F10,              0xFFC7}, // XK_F10
+        {KeyEvent.KEYCODE_F11,              0xFFC8}, // XK_F11
+        {KeyEvent.KEYCODE_F12,              0xFFC9}, // XK_F12
+        
+        {KeyEvent.KEYCODE_ESCAPE,           0xFF1B}, // XK_Escape
+        {KeyEvent.KEYCODE_WINDOW,           0xFFEB}, // XK_Super_L
+        {KeyEvent.KEYCODE_PAGE_UP,          0xFF55}, // XK_Page_Up
+        {KeyEvent.KEYCODE_PAGE_DOWN,        0xFF56}, // XK_Page_Down
+        {KeyEvent.KEYCODE_INSERT,           0xFF63}, // XK_Insert
+        
+        {HackKeyCode.KEYCODE_END,           0xFF57}, // XK_End
+        {HackKeyCode.KEYCODE_PRINT_SCREEN,  0xFF61}, // XK_Print
     };
 
     // a custom pre-built hashtable structure would be better...

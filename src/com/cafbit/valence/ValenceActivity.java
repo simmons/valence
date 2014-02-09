@@ -30,7 +30,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,26 +37,18 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageButton;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
 import android.widget.ToggleButton;
 
 import com.cafbit.valence.RFBThread.RFBThreadHandler;
 import com.cafbit.valence.TouchPadView.OnTouchPadEventListener;
 import com.cafbit.valence.power.WakeLockFactory;
 import com.cafbit.valence.rfb.RFBKeyEvent;
-import com.cafbit.valence.rfb.RFBKeyEvent.Action;
-import com.cafbit.valence.rfb.RFBKeyEvent.SpecialKey;
 import com.cafbit.valence.rfb.RFBPointerEvent;
 import com.cafbit.valence.rfb.RFBSecurity;
 import com.cafbit.valence.rfb.RFBSecurityARD;
@@ -84,10 +75,6 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     private boolean isRunning = false;
     private InputMethodManager inputMethodManager;
     private TouchPadView touchPadView = null;
-
-    private ToggleButton modButton = null;
-    private ToggleButton keyButton = null;
-    private SpecialKey modifier = null;
 
     private ProximityPowerManager proximityPowerManager = null;
 
@@ -120,70 +107,16 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         }
         this.username = uri.getQueryParameter("username");
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
+        LayoutInflater factory = LayoutInflater.from(this);
+        View touchpadLayout = factory.inflate(R.layout.touchpad, null);
+        setContentView(touchpadLayout);
 
-        //TouchPadView
-        touchPadView = new TouchPadView(this);
+        findViewById(R.id.layoutModifierButtons).setVisibility(View.GONE);
+        findViewById(R.id.layoutFKeyButtons).setVisibility(View.GONE);
+        findViewById(R.id.layoutArrowButtons).setVisibility(View.GONE);
+
+        touchPadView = (TouchPadView) findViewById(R.id.touchPad);
         touchPadView.setOnTouchPadEvent(this);
-
-        modButton = newModifierButton("mod");
-        modButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                modButton.setChecked(false);
-                if (modifier == null) {
-                    view.showContextMenu();
-                } else {
-                    modifier = null;
-                }
-            }
-        });
-        registerForContextMenu(modButton);
-
-        keyButton = new ToggleButton(this);
-        keyButton.setText("keys");
-        keyButton.setTextOn("keys");
-        keyButton.setTextOff("keys");
-        keyButton.setFocusable(false);
-        keyButton.setFocusableInTouchMode(false);
-        keyButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                keyButton.setChecked(false);
-                view.showContextMenu();
-            }
-        });
-        registerForContextMenu(keyButton);
-
-        ImageButton keyboardButton = new ImageButton(this);
-        Drawable keyboardDrawable = getResources().getDrawable(R.drawable.keyboard);
-        keyboardButton.setImageDrawable(keyboardDrawable);
-        keyboardButton.setScaleType(ScaleType.CENTER_INSIDE);
-        keyboardButton.setFocusable(false);
-        keyboardButton.setFocusableInTouchMode(false);
-        keyboardButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                inputMethodManager.toggleSoftInput(0, 0);
-            }
-        });
-
-        // assemble layout of buttons
-        LinearLayout buttonLayout = new LinearLayout(this);
-        LinearLayout rightLayout = new LinearLayout(this);
-        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
-        buttonLayout.addView(modButton);
-        buttonLayout.addView(keyButton);
-        rightLayout.addView(keyboardButton);
-        rightLayout.setGravity(Gravity.RIGHT);
-        buttonLayout.addView(rightLayout, LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
-
-        layout.addView(touchPadView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1));
-        layout.addView(buttonLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0));
-
-        setContentView(layout);
-
         touchPadView.setFocusable(true);
         touchPadView.setFocusableInTouchMode(true);
         touchPadView.requestFocus();
@@ -195,12 +128,10 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             startThread();
         }
 
-        if (null == proximityPowerManager) {
-            proximityPowerManager = new ProximityPowerManager(
-                    new WakeLockFactory(
-                            (PowerManager) getSystemService(Context.POWER_SERVICE)),
-                    PreferenceManager.getDefaultSharedPreferences(this));
-        }
+        proximityPowerManager = new ProximityPowerManager(
+                new WakeLockFactory(
+                        (PowerManager) getSystemService(Context.POWER_SERVICE)),
+                PreferenceManager.getDefaultSharedPreferences(this));
     }
 
     /**
@@ -292,6 +223,50 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     }
 
     //////////////////////////////////////////////////////////////////////
+    // Button Listeners
+    //////////////////////////////////////////////////////////////////////
+
+    public void onClickKeyButton(View view) {
+        int keyCode = ButtonTranslator.toKeyCode(view);
+
+        if (view instanceof ToggleButton) {
+            ToggleButton button = (ToggleButton) view;
+            if (button.isChecked()) {
+                onKeyDown(keyCode, new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+            } else {
+                onKeyUp(keyCode, new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+            }
+        } else {
+            onKeyDown(keyCode, new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+            onKeyUp(keyCode, new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+        }
+    }
+
+    public void onClickKeyboard(View view) {
+        inputMethodManager.toggleSoftInput(0, 0);
+    }
+
+    public void onClickFKeys(View view) {
+        toggleVisibility(findViewById(R.id.layoutFKeyButtons));
+    }
+
+    public void onClickModifierKeys(View view) {
+        toggleVisibility(findViewById(R.id.layoutModifierButtons));
+    }
+
+    public void onClickArrowKeys(View view) {
+        toggleVisibility(findViewById(R.id.layoutArrowButtons));
+    }
+
+    private void toggleVisibility(View view) {
+        if (View.GONE == view.getVisibility()) {
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////
     // options menu
     //////////////////////////////////////////////////////////////////////
 
@@ -311,64 +286,8 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     }
 
     //////////////////////////////////////////////////////////////////////
-    // context menus
+    // thread management
     //////////////////////////////////////////////////////////////////////
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.equals(modButton)) {
-            menu.setHeaderTitle("Modifier keys");
-            for (int i = 0; i < RFBKeyEvent.MODIFIERS.length; i++) {
-                SpecialKey key = RFBKeyEvent.MODIFIERS[i];
-                menu.add(Menu.NONE, (1 << 16) | i, Menu.NONE, key.name);
-            }
-        } else if (v.equals(keyButton)) {
-            menu.setHeaderTitle("Special keys");
-            for (int i = 0; i < RFBKeyEvent.SPECIALS.length; i++) {
-                SpecialKey key = RFBKeyEvent.SPECIALS[i];
-                menu.add(Menu.NONE, (2 << 16) | i, Menu.NONE, key.name);
-            }
-
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        int major = itemId >> 16;
-        int minor = itemId & 0xFFFF;
-
-        switch (major) {
-        case 1:
-            // mod menu
-            if ((minor >= 0) && (minor < RFBKeyEvent.MODIFIERS.length)) {
-                modifier = RFBKeyEvent.MODIFIERS[minor];
-                modButton.setTextOn(modifier.shortName);
-                modButton.setChecked(true);
-            }
-            break;
-        case 2:
-            // key menu
-            if ((minor >= 0) && (minor < RFBKeyEvent.SPECIALS.length)) {
-                SpecialKey key = RFBKeyEvent.SPECIALS[minor];
-                sendKey(new RFBKeyEvent(key, Action.KEY_DOWN_AND_UP));
-            }
-            break;
-        }
-
-        return true;
-    }
-
-    private ToggleButton newModifierButton(String text) {
-        ToggleButton button = new ToggleButton(this);
-        button.setText(text);
-        button.setTextOn(text);
-        button.setTextOff(text);
-        button.setFocusable(false);
-        button.setFocusableInTouchMode(false);
-        return button;
-    }
 
     private void startThread() {
         if (rfbThread != null) {
@@ -454,8 +373,19 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     }
 
     @Override
+    public boolean onKeyUp(int keyCode, KeyEvent keyEvent) {
+//        Log.d(TAG, "********** onKeyUp() keyCode=" + keyCode + " keyEvent=" + keyEvent + " isCanceled=" + keyEvent.isCanceled() + " isTracking=" + keyEvent.isTracking());
+        if (shouldIgnoreKeyCode(keyCode)) {
+            return super.onKeyUp(keyCode, keyEvent);
+        }
+        sendKey(new RFBKeyEvent(keyEvent));
+        return true;
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
-        if ((keyCode == KeyEvent.KEYCODE_MENU) || (keyCode == KeyEvent.KEYCODE_BACK)) {
+//        Log.d(TAG, "********** onKeyDown() keyCode=" + keyCode + " keyEvent=" + keyEvent + " isCanceled=" + keyEvent.isCanceled() + " isTracking=" + keyEvent.isTracking());
+        if (shouldIgnoreKeyCode(keyCode)) {
             return super.onKeyDown(keyCode, keyEvent);
         }
         sendKey(new RFBKeyEvent(keyEvent));
@@ -479,12 +409,11 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         }
     }
 
-    /*
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent keyEvent) {
-        System.out.println("********** onKeyUp() keyCode="+keyCode+" keyEvent="+keyEvent+" isCanceled="+keyEvent.isCanceled()+" isTracking="+keyEvent.isTracking());
-        return super.onKeyUp(keyCode, keyEvent);
+    private boolean shouldIgnoreKeyCode(int keyCode) {
+        return (keyCode == KeyEvent.KEYCODE_MENU) || (keyCode == KeyEvent.KEYCODE_BACK);
     }
+
+    /*
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent keyEvent) {
         System.out.println("********** onKeyLongPress() keyCode="+keyCode+" keyEvent="+keyEvent);
@@ -504,15 +433,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
 
     private void sendKey(RFBKeyEvent rfbKeyEvent) {
         if (isConnected()) {
-            if (modifier != null) {
-                rfbThread.getHandler().onRFBEvent(new RFBKeyEvent(modifier, Action.KEY_DOWN));
-            }
             rfbThread.getHandler().onRFBEvent(rfbKeyEvent);
-            if (modifier != null) {
-                rfbThread.getHandler().onRFBEvent(new RFBKeyEvent(modifier, Action.KEY_UP));
-                modifier = null;
-                modButton.setChecked(false);
-            }
         }
     }
 

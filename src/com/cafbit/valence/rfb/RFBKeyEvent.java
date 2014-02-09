@@ -35,80 +35,23 @@ public class RFBKeyEvent implements RFBEvent {
         public boolean isKeyDown() {
             return KEY_DOWN.equals(this) || KEY_DOWN_AND_UP.equals(this);
         }
+
+        public static Action fromKeyEvent(KeyEvent keyEvent) {
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                return KEY_DOWN;
+            } else if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                return KEY_UP;
+            } else {
+                throw new IllegalArgumentException("Unknown KeyEvent action. KeyEvent = " + keyEvent.toString());
+            }
+        }
     }
-
-    public static class SpecialKey {
-        public String name;
-        public String shortName;
-        public int keysym;
-
-        public static SpecialKey SHIFT = new SpecialKey("Shift", "shift", 0xFFE1);
-        public static SpecialKey CTRL = new SpecialKey("Ctrl", "ctrl", 0xFFE3);
-        public static SpecialKey ALT = new SpecialKey("Alt", "alt", 0xFFE9);
-        public static SpecialKey WIN = new SpecialKey("Win/Cmd", "win", 0xFFEB);
-
-        public SpecialKey(String name, int keysym) {
-            this.name = name;
-            this.shortName = name;
-            this.keysym = keysym;
-        }
-
-        public SpecialKey(String name, String shortName, int keysym) {
-            this.name = name;
-            this.shortName = shortName;
-            this.keysym = keysym;
-        }
-
-        @Override
-        public String toString() {
-
-            return "SpecialKey("
-                    + "name=["
-                    + (name == null ? "null" : name.toString())
-                    + "], shortName=["
-                    + (shortName == null ? "null" : shortName.toString())
-                    + "], keysym=["
-                    + Integer.toHexString(keysym)
-                    + "]";
-
-        }
-    };
-
-    public static final SpecialKey MODIFIERS[] = {
-            SpecialKey.SHIFT,
-            SpecialKey.CTRL,
-            SpecialKey.ALT,
-            SpecialKey.WIN
-    };
-
-    public static final SpecialKey SPECIALS[] = {
-            new SpecialKey("Esc", 0xFF1B),
-            new SpecialKey("Tab", 0xFF09),
-            new SpecialKey("F1", 0xFFBE),
-            new SpecialKey("F2", 0xFFBF),
-            new SpecialKey("F3", 0xFFC0),
-            new SpecialKey("F4", 0xFFC1),
-            new SpecialKey("F5", 0xFFC2),
-            new SpecialKey("F6", 0xFFC3),
-            new SpecialKey("F7", 0xFFC4),
-            new SpecialKey("F8", 0xFFC5),
-            new SpecialKey("F9", 0xFFC6),
-            new SpecialKey("F10", 0xFFC7)
-    };
 
     private final int keysym;
     private final Action action;
 
     public RFBKeyEvent(KeyEvent keyEvent) {
-        this(KeyTranslator.translate(keyEvent), Action.KEY_DOWN_AND_UP);
-    }
-
-    public RFBKeyEvent(SpecialKey special) {
-        this(special.keysym, Action.KEY_DOWN_AND_UP);
-    }
-
-    public RFBKeyEvent(SpecialKey special, Action action) {
-        this(special.keysym, action);
+        this(KeyTranslator.translate(keyEvent), Action.fromKeyEvent(keyEvent));
     }
 
     public RFBKeyEvent(char ch) {
