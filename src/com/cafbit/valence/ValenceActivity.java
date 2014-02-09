@@ -164,7 +164,7 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         keyboardButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                inputMethodManager.showSoftInput(touchPadView, 0);
+                inputMethodManager.toggleSoftInput(0, 0);
             }
         });
 
