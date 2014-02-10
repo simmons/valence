@@ -1541,6 +1541,18 @@ public class KeyTranslator {
         {KeyEvent.KEYCODE_MENU,             0},
         {KeyEvent.KEYCODE_NOTIFICATION,     0},
         {KeyEvent.KEYCODE_SEARCH,           0xFF1B}, // XK_Escape
+        {KeyEvent.KEYCODE_F1,               0xFFBE}, // F1
+        {KeyEvent.KEYCODE_F2,               0xFFBF}, // F2
+        {KeyEvent.KEYCODE_F3,               0xFFC0}, // F3
+        {KeyEvent.KEYCODE_F4,               0xFFC1}, // F4
+        {KeyEvent.KEYCODE_F5,               0xFFC2}, // F5
+        {KeyEvent.KEYCODE_F6,               0xFFC3}, // F6
+        {KeyEvent.KEYCODE_F7,               0xFFC4}, // F7
+        {KeyEvent.KEYCODE_F8,               0xFFC5}, // F8
+        {KeyEvent.KEYCODE_F9,               0xFFC6}, // F9
+        {KeyEvent.KEYCODE_F10,              0xFFC7}, // F10
+        {KeyEvent.KEYCODE_F11,              0xFFC8}, // F11
+        {KeyEvent.KEYCODE_F12,              0xFFC9}, // F12
     };
 
     // a custom pre-built hashtable structure would be better...
