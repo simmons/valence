@@ -21,8 +21,28 @@ limitations under the License.
         android:summary="@string/pref_SHOW_TOUCHPAD_HINT_OVERLAY_summary"
         android:defaultValue="true" />
     <CheckBoxPreference 
+        android:key="pref_SHOW_USER_TEXT_OVERLAY" 
+        android:title="@string/pref_SHOW_USER_TEXT_OVERLAY" 
+        android:summary="@string/pref_SHOW_USER_TEXT_OVERLAY_summary"
+        android:defaultValue="true" />
+    <EditTextPreference 
+        android:inputType="number"
+        android:numeric="integer"
+        android:key="pref_USER_TEXT_OVERLAY_TIMEOUT_SECONDS" 
+        android:title="@string/pref_USER_TEXT_OVERLAY_TIMEOUT_SECONDS" 
+        android:summary="@string/pref_USER_TEXT_OVERLAY_TIMEOUT_SECONDS_summary"
+        android:defaultValue="15" />
+    <CheckBoxPreference 
         android:key="pref_SCREEN_OFF_ON_PROXIMITY_SENSOR" 
         android:title="@string/pref_SCREEN_OFF_ON_PROXIMITY_SENSOR" 
         android:summary="@string/pref_SCREEN_OFF_ON_PROXIMITY_SENSOR_summary"
         android:defaultValue="true" />
+    <EditTextPreference 
+        android:inputType="number"
+        android:numeric="integer"
+        android:key="pref_PROXIMITY_TIMEOUT_SECONDS" 
+        android:title="@string/pref_PROXIMITY_TIMEOUT_SECONDS" 
+        android:summary="@string/pref_PROXIMITY_TIMEOUT_SECONDS_summary"
+        android:defaultValue="3600" />
+    
 </PreferenceScreen>

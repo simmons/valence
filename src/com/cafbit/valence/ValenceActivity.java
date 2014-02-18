@@ -21,6 +21,8 @@ package com.cafbit.valence;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,12 +45,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.cafbit.valence.RFBThread.RFBThreadHandler;
 import com.cafbit.valence.TouchPadView.OnTouchPadEventListener;
+import com.cafbit.valence.config.PreferencesUtils;
 import com.cafbit.valence.power.WakeLockFactory;
-import com.cafbit.valence.rfb.RFBKeyEvent;
+import com.cafbit.valence.rfb.RFBKeyEventListener;
 import com.cafbit.valence.rfb.RFBPointerEvent;
 import com.cafbit.valence.rfb.RFBSecurity;
 import com.cafbit.valence.rfb.RFBSecurityARD;
@@ -75,6 +79,8 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     private boolean isRunning = false;
     private InputMethodManager inputMethodManager;
     private TouchPadView touchPadView = null;
+    private RFBKeyEventListener rfbKeyEventListener = null;
+    private Collection<KeyEventListener> keyEventListeners;
 
     private ProximityPowerManager proximityPowerManager = null;
 
@@ -128,6 +134,12 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         touchPadView.setFocusable(true);
         touchPadView.setFocusableInTouchMode(true);
         touchPadView.requestFocus();
+
+        keyEventListeners = new ArrayList<KeyEventListener>();
+        keyEventListeners.add(
+                new UserFeedbackKeyEventListener(
+                        (TextView) findViewById(R.id.userText),
+                        PreferencesUtils.getDefaultSharedPreferencesNonNull(this)));
 
         RFBThread savedRfbThread = (RFBThread) getLastNonConfigurationInstance();
         if (savedRfbThread != null) {
@@ -239,14 +251,16 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
 
         if (view instanceof ToggleButton) {
             ToggleButton button = (ToggleButton) view;
+            int keyEventAction;
             if (button.isChecked()) {
-                onKeyDown(keyCode, new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+                keyEventAction = KeyEvent.ACTION_DOWN;
             } else {
-                onKeyUp(keyCode, new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+                keyEventAction = KeyEvent.ACTION_UP;
             }
+            onKeyEvent(new KeyEvent(keyEventAction, keyCode));
         } else {
-            onKeyDown(keyCode, new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
-            onKeyUp(keyCode, new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+            onKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+            onKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
         }
     }
 
@@ -319,6 +333,9 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
             rfbThread.setArd35Compatibility(true);
         }
         rfbThread.start();
+        rfbKeyEventListener = new RFBKeyEventListener();
+        rfbThread.registerForHandlerWhenReady(rfbKeyEventListener);
+        keyEventListeners.add(rfbKeyEventListener);
         startConnectDialog();
     }
 
@@ -329,6 +346,8 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
                 handler.quit();
             }
             rfbThread = null;
+            keyEventListeners.remove(rfbKeyEventListener);
+            rfbKeyEventListener = null;
         }
     }
 
@@ -383,42 +402,27 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent keyEvent) {
 //        Log.d(TAG, "********** onKeyUp() keyCode=" + keyCode + " keyEvent=" + keyEvent + " isCanceled=" + keyEvent.isCanceled() + " isTracking=" + keyEvent.isTracking());
-        if (shouldIgnoreKeyCode(keyCode)) {
-            return super.onKeyUp(keyCode, keyEvent);
-        }
-        sendKey(new RFBKeyEvent(keyEvent));
-        return true;
+        onKeyEvent(keyEvent);
+        return super.onKeyUp(keyCode, keyEvent);
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
 //        Log.d(TAG, "********** onKeyDown() keyCode=" + keyCode + " keyEvent=" + keyEvent + " isCanceled=" + keyEvent.isCanceled() + " isTracking=" + keyEvent.isTracking());
-        if (shouldIgnoreKeyCode(keyCode)) {
-            return super.onKeyDown(keyCode, keyEvent);
-        }
-        sendKey(new RFBKeyEvent(keyEvent));
-        return true;
+        onKeyEvent(keyEvent);
+        return super.onKeyDown(keyCode, keyEvent);
     }
 
     @Override
     public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent keyEvent) {
-        // handle the special case of a ACTION_MULTIPLE event with key code of KEYCODE_UNKNOWN,
-        // which signals a raw string of characters associated with the event.
-        if (keyCode == KeyEvent.KEYCODE_UNKNOWN) {
-            String chars = keyEvent.getCharacters();
-            if (chars != null) {
-                for (char c : chars.toCharArray()) {
-                    sendKey(new RFBKeyEvent(c));
-                }
-            }
-            return true;
-        } else {
-            return super.onKeyMultiple(keyCode, repeatCount, keyEvent);
-        }
+        onKeyEvent(keyEvent);
+        return super.onKeyMultiple(keyCode, repeatCount, keyEvent);
     }
 
-    private boolean shouldIgnoreKeyCode(int keyCode) {
-        return (keyCode == KeyEvent.KEYCODE_MENU) || (keyCode == KeyEvent.KEYCODE_BACK);
+    private void onKeyEvent(KeyEvent keyEvent) {
+        for (KeyEventListener listener : keyEventListeners) {
+            listener.onKeyEvent(keyEvent);
+        }
     }
 
     /*
@@ -438,12 +442,6 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         super.onUserInteraction();
     }
     */
-
-    private void sendKey(RFBKeyEvent rfbKeyEvent) {
-        if (isConnected()) {
-            rfbThread.getHandler().onRFBEvent(rfbKeyEvent);
-        }
-    }
 
     //
     // implement OnTouchPadEventListener

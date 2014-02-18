@@ -30,10 +30,23 @@ limitations under the License.
         Valence turns your Android phone or tablet into a remote
         keyboard and mouse for any computer running a VNC server.
     </string>
+    <string name="touchpad_hint_overlay">
+        Use this area as a touchpad.\n
+        Tap to click.\n
+        Tap then swipe to drag.\n
+        Two-finger tap to right click.\n
+        Two-finger swipe to scroll.\n
+    </string>
     <string name="pref_SHOW_TOUCHPAD_HINT_OVERLAY">Show hints</string>
     <string name="pref_SHOW_TOUCHPAD_HINT_OVERLAY_summary">Show UI hints on the touchpad</string>
+    <string name="pref_SHOW_USER_TEXT_OVERLAY">Show Typed Text</string>
+    <string name="pref_SHOW_USER_TEXT_OVERLAY_summary">Show text that is typed on the touchpad</string>
+    <string name="pref_USER_TEXT_OVERLAY_TIMEOUT_SECONDS">Typed Text Timeout</string>
+    <string name="pref_USER_TEXT_OVERLAY_TIMEOUT_SECONDS_summary">How long to show the typed on the touchpad</string>
     <string name="pref_SCREEN_OFF_ON_PROXIMITY_SENSOR">Proximity Sensor</string>
     <string name="pref_SCREEN_OFF_ON_PROXIMITY_SENSOR_summary">Turn off the screen using the proximity sensor</string>
+    <string name="pref_PROXIMITY_TIMEOUT_SECONDS">Proximity Sensor Timeout</string>
+    <string name="pref_PROXIMITY_TIMEOUT_SECONDS_summary">How long to keep the device awake while an object is in proximity to the phone</string>
     <string name="ctrl">Ctrl</string>
     <string name="win">Win</string>
     <string name="alt">Alt</string>
@@ -62,7 +75,7 @@ limitations under the License.
     <string name="insert">Insert</string>
     <string name="backspace">Backspace</string>
     <string name="delete">Del</string>
-    <string name="printScreen">Prt Scn</string>
+    <string name="printScreen">Pnt Scn</string>
     <string name="arrowKeys">Arrows</string>
     <string name="arrowUp">↑</string>
     <string name="arrowDown">↓</string>

@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.cafbit.valence.config;
+package com.cafbit.valence;
 
-public class PreferencesConstants {
-    public static final String SHOW_TOUCHPAD_HINT_OVERLAY = "pref_SHOW_TOUCHPAD_HINT_OVERLAY";
-    public static final String SHOW_USER_TEXT_OVERLAY = "pref_SHOW_USER_TEXT_OVERLAY";
-    public static final String USER_TEXT_OVERLAY_TIMEOUT_SECONDS = "pref_USER_TEXT_OVERLAY_TIMEOUT_SECONDS";
-    public static final String PROXIMITY_TIMEOUT_SECONDS = "pref_PROXIMITY_TIMEOUT_SECONDS";
-    public static final String SCREEN_OFF_ON_PROXIMITY_SENSOR = "pref_SCREEN_OFF_ON_PROXIMITY_SENSOR";
+import android.view.KeyEvent;
+
+public interface KeyEventListener {
+    void onKeyEvent(KeyEvent keyEvent);
 }
