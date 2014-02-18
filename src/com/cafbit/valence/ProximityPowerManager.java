@@ -29,7 +29,7 @@ import com.cafbit.valence.power.WakeLockWrapper;
  */
 public class ProximityPowerManager {
     private static final String LOG_TAG = "Valence.ProximityPowerManager";
-    private static final int DEFAULT_PROXIMITY_TIMEOUT_MILLISECONDS = 1 * 60 * 60 * 1000;
+    private static final String DEFAULT_PROXIMITY_TIMEOUT_SECONDS = Integer.toString(1 * 60 * 60); // 1 hour
 
     private final WakeLockWrapper mProximityWakeLock;
     private final SharedPreferences mPreferences;
@@ -59,9 +59,10 @@ public class ProximityPowerManager {
             if (isProximityPowerManagementEnabled()
                     && !mProximityWakeLock.isHeld()) {
                 mProximityWakeLock.acquire(
-                        mPreferences.getInt(
-                                PreferencesConstants.PROXIMITY_TIMEOUT_MILLISECONDS,
-                                DEFAULT_PROXIMITY_TIMEOUT_MILLISECONDS));
+                        Integer.valueOf(
+                                mPreferences.getString(
+                                        PreferencesConstants.PROXIMITY_TIMEOUT_SECONDS,
+                                        DEFAULT_PROXIMITY_TIMEOUT_SECONDS)) * 1000);
             }
         }
     }
