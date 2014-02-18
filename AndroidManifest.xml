@@ -27,7 +27,8 @@ limitations under the License.
     <application
         android:name="com.cafbit.valence.ValenceApplication"
         android:icon="@drawable/icon"
-        android:label="@string/app_name" >
+        android:label="@string/app_name" 
+        android:theme="@android:style/Theme.Holo" >
         <activity
             android:name="com.cafbit.valence.SelectionActivity"
             android:label="@string/app_name" >
