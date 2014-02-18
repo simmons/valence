@@ -21,12 +21,9 @@ package com.cafbit.valence;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
@@ -36,14 +33,10 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-import com.cafbit.valence.config.NullSharedPreferences;
-import com.cafbit.valence.config.PreferencesConstants;
-
 public class TouchPadView extends View {
 
     private TouchPadHandler touchPadHandler;
     private DisplayMetrics metrics = new DisplayMetrics();
-    private final SharedPreferences preferences;
 
     public static interface OnTouchPadEventListener {
         public void onTouchPadEvent(TouchPadEvent event);
@@ -55,13 +48,6 @@ public class TouchPadView extends View {
 
     public TouchPadView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        if (pref == null) {
-            preferences = new NullSharedPreferences();
-        } else {
-            preferences = pref;
-        }
 
         this.setBackgroundColor(Color.BLACK);
         drawSetup();
@@ -125,78 +111,6 @@ public class TouchPadView extends View {
          */
     }
 
-    private static class TextBox {
-        public int w = 0;
-        public int h = 0;
-    }
-
-    private TextBox getTextBox(Paint paint, String[] lines) {
-        Rect bounds = new Rect();
-        TextBox box = new TextBox();
-        float fontSpacing = fontPaint.getFontSpacing();
-        for (String line : lines) {
-            fontPaint.getTextBounds(line, 0, line.length(), bounds);
-            int w = bounds.right - bounds.left;
-            if (w > box.w) {
-                box.w = w;
-            }
-            box.h += fontSpacing;
-        }
-        return box;
-    }
-
-    private void renderText(Canvas canvas, float yposPercent, String[] lines) {
-        Rect bounds = new Rect();
-        int viewWidth = getWidth();
-        int viewHeight = getHeight();
-        int targetWidth = (int) (viewWidth * 0.75);
-        int maxHeight = (int) (viewHeight * 0.75);
-        float ts = 25.0f;
-        final int MAX_TEXT_SIZE = 32;
-        TextBox box;
-
-        // calculate the optimal text size
-        int i = 0;
-        while (true) {
-            fontPaint.setTextSize(ts);
-            box = getTextBox(fontPaint, lines);
-
-            float adjustment;
-            boolean isYadjustment = false;
-            if (box.h > maxHeight) {
-                adjustment = maxHeight / (float) box.h;
-                isYadjustment = true;
-            } else {
-                adjustment = targetWidth / (float) box.w;
-            }
-            if (((i >= 9) && (!isYadjustment)) || (i >= 12) || (adjustment > 0.99f && adjustment < 1.05f)) {
-                break;
-            } else {
-                ts = ts * adjustment;
-            }
-            i++;
-        }
-        if (ts > MAX_TEXT_SIZE) {
-            ts = MAX_TEXT_SIZE;
-            fontPaint.setTextSize(ts);
-        }
-        box = getTextBox(fontPaint, lines);
-        // System.out.printf("canvas: %dx%d  textbox: %dx%d  size: %f\n",
-        // viewWidth, viewHeight, textWidth, textHeight, ts);
-
-        // draw the text
-        float ypos = viewHeight * yposPercent - (box.h / 2.0f) + ts;
-        if (ypos < ts) {
-            ypos = ts;
-        }
-        for (String line : lines) {
-            float tw = fontPaint.measureText(line);
-            canvas.drawText(line, (viewWidth - tw) / 2, ypos, fontPaint);
-            ypos += fontPaint.getFontSpacing();
-        }
-
-    }
-
     @Override
     protected void onLayout(boolean changed, int left, int top, int right,
             int bottom) {
@@ -233,16 +147,6 @@ public class TouchPadView extends View {
         };
         canvas.drawLines(boxPoints, linePaint);
         canvas.drawLines(xPoints, grayLinePaint);
-
-        if (preferences.getBoolean(PreferencesConstants.SHOW_TOUCHPAD_HINT_OVERLAY, true)) {
-            renderText(canvas, 0.5f, new String[] {
-                    "Use this area as a touchpad.",
-                    "Tap to click.",
-                    "Tap then swipe to drag.",
-                    "Two-finger tap to right click.",
-                    "Two-finger swipe to scroll."
-            });
-        }
 
         return;
     }
