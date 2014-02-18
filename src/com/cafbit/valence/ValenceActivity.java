@@ -115,6 +115,14 @@ public class ValenceActivity extends Activity implements OnTouchPadEventListener
         findViewById(R.id.layoutFKeyButtons).setVisibility(View.GONE);
         findViewById(R.id.layoutArrowButtons).setVisibility(View.GONE);
 
+        ((ToggleButton) findViewById(R.id.ButtonAlt)).setChecked(false);
+        ((ToggleButton) findViewById(R.id.ButtonCtrl)).setChecked(false);
+        ((ToggleButton) findViewById(R.id.ButtonShift)).setChecked(false);
+        ((ToggleButton) findViewById(R.id.ButtonWin)).setChecked(false);
+        ((ToggleButton) findViewById(R.id.ButtonToggleModifierKeys)).setChecked(false);
+        ((ToggleButton) findViewById(R.id.ButtonToggleFKeys)).setChecked(false);
+        ((ToggleButton) findViewById(R.id.ButtonToggleArrowKeys)).setChecked(false);
+
         touchPadView = (TouchPadView) findViewById(R.id.touchPad);
         touchPadView.setOnTouchPadEvent(this);
         touchPadView.setFocusable(true);
