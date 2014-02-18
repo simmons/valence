@@ -2,6 +2,8 @@
  * Copyright 2011 David Simmons
  * http://cafbit.com/
  *
+ * Copyright (C) 2014 Alexandre Quesnel
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +20,8 @@
 package com.cafbit.valence;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -42,10 +46,14 @@ public class RFBThread extends Thread {
     private RFBRecvThread recvThread;
     private boolean connected = false;
 
+    private Collection<RFBThreadHandlerReadyCallback> rfbThreadHandlerReadyCallbacks;
+
     public RFBThread(ValenceHandler handler, String address, int port, RFBSecurity security) {
         this.parentHandler = handler;
         this.conn = new RFBConnection(address, port, security);
         setName("rfb-" + (serial++));
+        rfbThreadHandlerReadyCallbacks = new ArrayList<RFBThreadHandlerReadyCallback>();
+        myHandler = null;
     }
 
     public RFBThread(ValenceHandler handler, String address, RFBSecurity security) {
@@ -66,8 +74,24 @@ public class RFBThread extends Thread {
         this.parentHandler = valenceHandler;
     }
 
-    public RFBThreadHandler getHandler() {
+    public synchronized RFBThreadHandler getHandler() {
         return myHandler;
+    }
+
+    public synchronized void registerForHandlerWhenReady(RFBThreadHandlerReadyCallback callback) {
+        if (getHandler() == null) {
+            rfbThreadHandlerReadyCallbacks.add(callback);
+        } else {
+            callback.onHandlerReady(getHandler());
+        }
+    }
+
+    private synchronized void setHandler(RFBThreadHandler handler) {
+        myHandler = handler;
+
+        for (RFBThreadHandlerReadyCallback callback : rfbThreadHandlerReadyCallbacks) {
+            callback.onHandlerReady(myHandler);
+        }
     }
 
     public boolean isConnected() {
@@ -78,7 +102,7 @@ public class RFBThread extends Thread {
     public void run() {
         // set up the IPC
         Looper.prepare();
-        this.myHandler = new RFBThreadHandler();
+        setHandler(new RFBThreadHandler());
 
         // connect to the RFB server
         try {
@@ -154,6 +178,9 @@ public class RFBThread extends Thread {
                 break;
             case MSG_RFB_EVENT:
                 RFBEvent event = (RFBEvent) msg.obj;
+                if (!isConnected()) {
+                    break;
+                }
                 try {
                     conn.sendEvent(event);
                 } catch (IOException e) {
@@ -203,4 +230,7 @@ public class RFBThread extends Thread {
         }
     }
 
+    public static interface RFBThreadHandlerReadyCallback {
+        public void onHandlerReady(RFBThreadHandler handler);
+    }
 }
