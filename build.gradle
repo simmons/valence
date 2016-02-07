@@ -1,0 +1,64 @@
+import java.text.SimpleDateFormat
+
+apply plugin: 'com.android.application'
+
+def formatISO(date) {
+    def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(date)
+}
+def secSinceEpoc(date) {
+    return (int) date.getTime() / 1000
+}
+
+def buildTime = new Date()
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+    defaultConfig {
+        applicationId "com.gmail.at.android.bondvnc"
+        minSdkVersion 14
+        targetSdkVersion 21
+        // Use the current timestamp in seconds as the version number.
+        // Note: This value will overflow a signed int in 2038 ( = 1970 + (2**31 / (60*60*24*365)))
+        versionCode secSinceEpoc(buildTime)
+        versionName "1.0." + secSinceEpoc(buildTime) + "." + formatISO(buildTime)
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    signingConfigs {
+        release {
+            keyAlias 'com.gmail.at.android.bondvnc'
+        }
+    }
+    sourceSets.main {
+        manifest.srcFile file('AndroidManifest.xml')
+        assets {
+            srcDir 'assets'
+        }
+        java {
+            srcDir 'src'
+        }
+        res {
+            srcDir 'res'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile project(':netlib')
+    compile project(':xmlfoo')
+    compile project(':motelib')
+}
