@@ -19,8 +19,8 @@ limitations under the License.
 -->
 <resources>
     <string name="about_copyright">
+        © 2014-2016 Alexandre Quesnel\n
         © 2011-2012 David Simmons
-        2014 Alexandre Quesnel
     </string>
     <string name="about_url">http://cafbit.com/</string>
     <string name="about_description">
