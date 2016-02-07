@@ -24,11 +24,16 @@ android {
         // Note: This value will overflow a signed int in 2038 ( = 1970 + (2**31 / (60*60*24*365)))
         versionCode secSinceEpoc(buildTime)
         versionName "1.0." + secSinceEpoc(buildTime) + "." + formatISO(buildTime)
+
+        resValue "string", "app_name", "BondVNC"
+        resValue "string", "about_version", 'Version: ' + versionName
+        resValue "string", "about_build_date", 'Build: ' + formatISO(buildTime)
     }
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
             debuggable true
+            resValue "string", "app_name", "BondVNC-Dev"
         }
         release {
             minifyEnabled false
